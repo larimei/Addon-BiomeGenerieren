@@ -43,6 +43,8 @@ class MainPanel(bpy.types.Panel):
         row.operator("object.text_add", text="Add Mountains")
 
 
+
+#insert operator
 class SimpleOperator(bpy.types.Operator):
     """Tooltip"""
     bl_idname = "object.simple_operator"
