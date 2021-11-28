@@ -4,7 +4,6 @@ import math
 import mathutils
 import random
 import bpy
-BLADES = random.randrange(0, 8)
 
 WIDTH_MAX = 0.6
 WIDTH_MIN = 0.03
@@ -36,8 +35,9 @@ class generateGrass():
         def map_range(v, from_min, from_max, to_min, to_max):
             """Bringt einen Wert v von einer Skala (from_min, from_max) auf eine neue Skala (to_min, to_max)"""
             return to_min + (v - from_min) * (to_max - to_min) / (from_max - from_min)
+        blades = random.randrange(0, 5)
 
-        for i in range(BLADES):
+        for i in range(blades):
 
             # Zufällige Werte für jedes Blatt generieren
             c_height = random.randrange(HEIGHT_MIN, HEIGHT_MAX)
@@ -97,6 +97,6 @@ class generateGrass():
 gen = generateGrass()
 
 for i in range(1000):
-    x = random.randrange(-500, 500)
-    y = random.randrange(-500, 500)
+    x = random.randrange(-100, 100)
+    y = random.randrange(-100, 100)
     gen.genGrass(x, y)
