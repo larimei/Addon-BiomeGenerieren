@@ -16,14 +16,25 @@ ROT_BASE_MAX = 25
 ROT_TIP_MIN = 30
 ROT_TIP_MAX = 90
 ROT_FALLOFF = 5
+# Szene leeren
+bpy.ops.object.select_all(action='SELECT')  # selektiert alle Objekte
+# löscht selektierte objekte
+bpy.ops.object.delete(use_global=False, confirm=False)
+bpy.ops.outliner.orphans_purge()  # löscht überbleibende Meshdaten etc.
 
 
 class generateGrass():
 
     def genGrass(self, x, y):
-
+        object_color = (
+            random.uniform(0, 1),
+            random.uniform(0, 1),
+            random.uniform(0, 1),
+            1  # Alpha-Wert der Farbe (Intransparenz) - soll hier immer 1 sein
+        )
         grass_mesh = bpy.data.meshes.new("grass_shrub_mesh")
         grass_object = bpy.data.objects.new("grass shrub", grass_mesh)
+        grass_object.color = object_color
         grass_object.location = (x, y, 0)
         # Mesh in aktuelle Collection der Szene verlinken
         bpy.context.collection.objects.link(grass_object)
@@ -93,10 +104,65 @@ class generateGrass():
         bm.to_mesh(grass_mesh)
         bm.free()
 
+    def genFlower(self, _x, _y):
+        object_color = (
+            random.uniform(0, 1),
+            random.uniform(0, 1),
+            random.uniform(0, 1),
+            1  # Alpha-Wert der Farbe (Intransparenz) - soll hier immer 1 sein
+        )
+
+        bpy.ops.mesh.primitive_cube_add(
+            location=(_x, _y, 6), scale=(0.5, 0.5, 0.15))
+
+        paddelData = bpy.context.active_object.data
+        paddel: bpy.types.Object = bpy.context.active_object
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.select_mode(type="FACE")
+        bm = bmesh.from_edit_mesh(paddelData)
+
+        if hasattr(bm.faces, "ensure_lookup_table"):
+            bm.faces.ensure_lookup_table()
+
+        for i in range(len(bm.faces)):
+            bm.faces[i].select = False
+        bm.faces[1].select = True
+        bmesh.ops.translate(
+            bm, verts=bm.faces[1].verts, vec=bm.faces[1].normal * 3)
+        c = bm.faces[1].calc_center_median()
+        for v in bm.faces[1].verts:
+            v.co = c + 2 * (v.co - c)
+        # Show the updates in the viewport
+        bmesh.update_edit_mesh(paddelData, True)
+        bpy.ops.object.mode_set(mode='OBJECT')
+
+        num = 8
+        rad = 2
+        for i in range(num):
+            y = math.sin(i/num * math.pi * 2) * rad
+            x = math.cos(i / num * math.pi*2) * rad
+            angle = i/num * 2 * math.pi - math.pi/2
+
+            ob = bpy.data.objects.new('ob', paddelData)
+            ob.color = object_color
+            bpy.context.collection.objects.link(ob)
+            ob.location = (_x + x, _y + y, 6)
+            ob.rotation_euler.z = angle
+
+        bpy.data.objects.remove(paddel)
+        bpy.ops.mesh.primitive_ico_sphere_add(
+            location=(_x, _y, 6), scale=(1.75, 1.75, 0.5))
+        bpy.context.active_object.color = object_color
+        bpy.ops.mesh.primitive_cube_add(
+            location=(_x, _y, 2), scale=(0.75, 0.75, 4))
+        bpy.context.active_object.color = object_color
+
 
 gen = generateGrass()
 
-for i in range(1000):
-    x = random.randrange(-100, 100)
-    y = random.randrange(-100, 100)
+for i in range(2000):
+    x = random.randrange(-400, 400)
+    y = random.randrange(-400, 400)
+    if(x % 20 == 0):
+        gen.genFlower(x, y)
     gen.genGrass(x, y)

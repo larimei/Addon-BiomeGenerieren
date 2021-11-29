@@ -8,9 +8,9 @@ bpy.ops.object.delete(use_global=False, confirm=False)
 bpy.ops.outliner.orphans_purge()  # löscht überbleibende Meshdaten etc.
 
 
-bpy.ops.mesh.primitive_cube_add(location=(0, 0, 0), scale=(0.5, 0.5, 0.15))
-paddelData = bpy.data.objects["Cube"].data
-paddel: bpy.types.Object = bpy.data.objects["Cube"]
+bpy.ops.mesh.primitive_cube_add(location=(5, 5, 0), scale=(0.5, 0.5, 0.15))
+paddelData = bpy.context.active_object.data
+paddel: bpy.types.Object = bpy.context.active_object
 bpy.ops.object.mode_set(mode='EDIT')
 bpy.ops.mesh.select_mode(type="FACE")
 bm = bmesh.from_edit_mesh(paddelData)
@@ -38,9 +38,11 @@ for i in range(num):
 
     ob = bpy.data.objects.new('ob', paddelData)
     bpy.context.collection.objects.link(ob)
-    ob.location = (x, y, 0)
+    ob.location = (5 + x, 5 + y, 0)
     ob.rotation_euler.z = angle
 
 bpy.data.objects.remove(paddel)
 bpy.ops.mesh.primitive_ico_sphere_add(
-    location=(0, 0, 0), scale=(1.75, 1.75, 0.5))
+    location=(5, 5, 0), scale=(1.75, 1.75, 0.5))
+bpy.ops.mesh.primitive_cube_add(
+    location=(5, 5, -4), scale=(0.75, 0.75, 4))
