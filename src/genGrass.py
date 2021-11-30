@@ -55,8 +55,8 @@ class GenerateGrass ():
         def map_range(v, from_min, from_max, to_min, to_max):
             """Bringt einen Wert v von einer Skala (from_min, from_max) auf eine neue Skala (to_min, to_max)"""
             return to_min + (v - from_min) * (to_max - to_min) / (from_max - from_min)
-        blades = random.randrange(0, 5)
-
+        blades = random.randrange(1, 8)
+        print(blades)
         for i in range(blades):
 
             # Zufällige Werte für jedes Blatt generieren
