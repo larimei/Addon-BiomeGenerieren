@@ -4,12 +4,6 @@ import bmesh
 import mathutils
 import math
 
-def get_average(vert_range):
-    med = mathutils.Vector()
-    for vert in vert_range:
-        vec = vert.co
-        med = med + vec
-    return med / len(vert_range)
 
 mesh = bpy.data.meshes.new("tree")  # add the new mesh
 obj = bpy.data.objects.new(mesh.name, mesh)
@@ -50,8 +44,6 @@ bm = bmesh.from_edit_mesh(me)
 
 verts = bm.verts
 num_verts = len(verts)
-scale = 1 / (num_verts / 4)
-j = 0
 for i in range(0, num_verts):
     bm.verts.ensure_lookup_table()
     #bmesh.ops.scale(bm, vec=(0, 0, 0), space=(mathutils.Matrix.Scale(2,2,2)), verts=[verts[i]]) #????
