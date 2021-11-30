@@ -1,91 +1,63 @@
 import bpy
-import bmesh
-import math
-import mathutils
 import random
+from mathutils import Vector
+import bmesh
 
+def get_average(vert_range):
+    med = Vector()
+    for vert in vert_range:
+        vec = vert.co
+        med = med + vec
+    return med / len(vert_range)
 
-def map_range(v, from_min, from_max, to_min, to_max):
-    """Bringt einen Wert v von einer Skala (from_min, from_max) auf eine neue Skala (to_min, to_max)"""
-    return to_min + (v - from_min) * (to_max - to_min) / (from_max - from_min)
+mesh = bpy.data.meshes.new("tree")  # add the new mesh
+obj = bpy.data.objects.new(mesh.name, mesh)
+col = bpy.data.collections.get("Collection")
+col.objects.link(obj)
+bpy.context.view_layer.objects.active = obj
 
-AMOUNT = 8
+VERTICES = 10
+MIN_SHIFT = 0.8
+MAX_SHIFT = 1.2
+verts = []
+edges = []
 
-WIDTH_MAX = 0.6
-WIDTH_MIN = 0.03
-
-HEIGHT_MIN = 4
-HEIGHT_MAX = 12
-
-ROT_BASE_MIN = 1
-ROT_BASE_MAX = 4
-ROT_TIP_MIN = 5
-ROT_TIP_MAX = 20
-ROT_FALLOFF = 5
-
-# Szene leeren
-bpy.ops.object.select_all(action='SELECT')  # selektiert alle Objekte
-# löscht selektierte objekte
-bpy.ops.object.delete(use_global=False, confirm=False)
-bpy.ops.outliner.orphans_purge()  # löscht überbleibende Meshdaten etc.
-
-# Mesh und Objekt erstellen
-trunk_mesh = bpy.data.meshes.new("trunk_shrub_mesh")
-trunk_object = bpy.data.objects.new("trunk shrub", trunk_mesh)
-
-# Mesh in aktuelle Collection der Szene verlinken
-bpy.context.collection.objects.link(trunk_object)
-
-#
-bm = bmesh.new()
-bm.from_mesh(trunk_mesh)
-c_height = random.randrange(HEIGHT_MIN, HEIGHT_MAX)
-
-rot = random.uniform(ROT_BASE_MIN, ROT_BASE_MAX)
-rot_tip = random.uniform(ROT_TIP_MIN, ROT_TIP_MAX)
-
-vertices = []
-last_vert = bm.verts.new((0,0,0))
+for i in range(VERTICES):
+    posZ = i * 0.6
+    posY = 1 * random.uniform(MIN_SHIFT,MAX_SHIFT)
+    posX = 1 * random.uniform(MIN_SHIFT,MAX_SHIFT)
+    vert = (posX,posY,posZ)
+    verts.append(vert)
+    if i is not 0:
+        edge = (i-1,i)
+        edges.append(edge)
     
-vertices.append(last_vert)
+faces = []
+
+trunk = mesh.from_pydata(verts, edges, faces)
+
+
+me = obj.data
+
+bpy.ops.object.editmode_toggle()
+
+
+# Get a BMesh representation
+bm = bmesh.from_edit_mesh(me)
 
 
 
-for i in range(AMOUNT):
+verts = bm.verts
+num_verts = len(verts)
+scale = 1 / (num_verts / 4)
+j = 0
+for i in range(0, num_verts):
+    bm.verts.ensure_lookup_table()
+    bmesh.ops.scale(bm, vec=(2, 2, 1), verts=[verts[i]]) #????
+    bm.verts.ensure_lookup_table()
 
-    vert = bm.verts.new((0, 0, i))
-    progress = i / c_height
+bmesh.update_edit_mesh(me, True)
 
-    v = math.pow(progress, 0.8)
+bpy.ops.object.modifier_add(type='SKIN')
 
-    pos_x = map_range(v, 0, 1, WIDTH_MAX, WIDTH_MIN)
-    """ 
-    # Halm immer weiter biegen desto weiter oben wir uns im Mesh/Loop befinden
-    rot_angle = map_range(math.pow(progress, ROT_FALLOFF), 0, 1, rot, rot_tip)
-    rot_matrix = mathutils.Matrix.Rotation(math.radians(rot_angle), 4, 'X')
-    bmesh.ops.rotate(bm, cent=(0, 0, 0), matrix=rot_matrix, verts=[vert]) """
-        
-    # Jeden Halm zufällig auf Z Achse rotieren
-    random_angle = random.randrange(0, 1)
-    rot_matrix_blade = mathutils.Matrix.Rotation(math.radians(0), 4, 'Z')
-
-    # Dabei jeden Vertex des aktuellen Halms rotieren
-    for v in vertices:
-        bmesh.ops.rotate(bm, cent=(0, 0, 0), matrix=rot_matrix_blade, verts=[v])
-
-
-    bm.edges.new((vert, last_vert))
-
-        # Vertices der Vertices-Liste des aktuellen Halms hinzufügen
-    vertices.append(vert)
-        # Letzte Vertices speichern, um sie für die generierung des nächsten Polygons zu verwenden
-    last_vert = vert
-    
-
-# BMesh auf Mesh anwenden und abschließen
-bm.to_mesh(trunk_mesh)
-bm.free()
-
-
-
-
+leaves = bpy.ops.mesh.primitive_ico_sphere_add(radius=1, enter_editmode=False, align='WORLD', location=(posX, posY, posZ + 1), scale=(random.uniform(2,4), random.uniform(2,4), random.uniform(6,8)))
