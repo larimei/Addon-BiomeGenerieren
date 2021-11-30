@@ -1,10 +1,11 @@
 import bpy
 import random
-from mathutils import Vector
 import bmesh
+import mathutils
+import math
 
 def get_average(vert_range):
-    med = Vector()
+    med = mathutils.Vector()
     for vert in vert_range:
         vec = vert.co
         med = med + vec
@@ -17,8 +18,8 @@ col.objects.link(obj)
 bpy.context.view_layer.objects.active = obj
 
 VERTICES = 10
-MIN_SHIFT = 0.8
-MAX_SHIFT = 1.2
+MIN_SHIFT = 0.9
+MAX_SHIFT = 1.1
 verts = []
 edges = []
 
@@ -53,11 +54,16 @@ scale = 1 / (num_verts / 4)
 j = 0
 for i in range(0, num_verts):
     bm.verts.ensure_lookup_table()
-    bmesh.ops.scale(bm, vec=(2, 2, 1), verts=[verts[i]]) #????
+    #bmesh.ops.scale(bm, vec=(0, 0, 0), space=(mathutils.Matrix.Scale(2,2,2)), verts=[verts[i]]) #????
+    random_angle = random.randrange(0, 20)
+    rot_matrix_blade = mathutils.Matrix.Rotation(math.radians(random_angle),4, 'Z')
+    bmesh.ops.rotate(bm, cent=(0, 0, 0), matrix=rot_matrix_blade, verts=[verts[i]])
     bm.verts.ensure_lookup_table()
 
 bmesh.update_edit_mesh(me, True)
 
+bpy.ops.object.editmode_toggle()
+
 bpy.ops.object.modifier_add(type='SKIN')
 
-leaves = bpy.ops.mesh.primitive_ico_sphere_add(radius=1, enter_editmode=False, align='WORLD', location=(posX, posY, posZ + 1), scale=(random.uniform(2,4), random.uniform(2,4), random.uniform(6,8)))
+leaves = bpy.ops.mesh.primitive_ico_sphere_add(radius=random.uniform(1,1.2), enter_editmode=False, align='WORLD', location=(posX, posY, posZ + 2), scale=(random.uniform(2.5,5), random.uniform(2.5,5), random.uniform(6,8)))
