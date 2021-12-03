@@ -1,5 +1,7 @@
 
+import math
 import random
+
 from . import genGrass
 import bpy
 
@@ -16,7 +18,7 @@ bl_info = {
     "category": "Add Mesh",
 }
 
-#from .  import ui
+# from .  import ui
 # This is the Main Panel in 3DView
 
 
@@ -28,12 +30,17 @@ class MainPanel(bpy.types.Panel):
     bl_category = 'Generate Biomes'
 
     def draw(self, context):
+
         layout = self.layout
         layout.scale_x = 4
-        layout.scale_y = 2
+        layout.scale_y = 4
 
         row = layout.row()
         row.label(text="Add a biome", icon='WORLD')
+
+        col = self.layout.column(align=True)
+        col.prop(context.scene, "range")
+
         row = layout.row()
         # insert operator
         row.operator("object.text_add", text="Add Desert")
@@ -69,18 +76,55 @@ class GenerateGrass(bpy.types.Operator):
     bl_label = "Button text"
 
     def execute(self, context):
+
         grassContainer = bpy.data.objects.new("grassContainer", None)
         bpy.context.collection.objects.link(grassContainer)
         flowerContainer = bpy.data.objects.new("flowerContainer", None)
         bpy.context.collection.objects.link(flowerContainer)
-        for i in range(2000):
-            x = random.randrange(-200, 200)
-            y = random.randrange(-200, 200)
-            randMod = random.randrange(100, 150)
-            if(i % randMod == 0):
+        bushesContainer = bpy.data.objects.new("bushesContainer", None)
+        bpy.context.collection.objects.link(bushesContainer)
+
+        grassMat: bpy.types.Material = bpy.data.materials.new(
+            name="grassMaterial")
+        grassMat.use_nodes = True
+        grassMat.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
+            0, 0.4, 0.1, 1)
+        bushMat: bpy.types.Material = bpy.data.materials.new(
+            name="bushMaterial")
+        bushMat.use_nodes = True
+        bushMat.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
+            0, 0.3, 0.2, 1)
+        stemMat: bpy.types.Material = bpy.data.materials.new(
+            name="stemMaterial")
+        stemMat.use_nodes = True
+        stemMat.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
+            0.4, 0.1, 0, 1)
+        blossomMat: bpy.types.Material = bpy.data.materials.new(
+            name="blossomMaterial")
+        blossomMat.use_nodes = True
+        blossomMat.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
+            1, 1, 0.6, 1)
+
+        terrainRange: int = int(context.scene.range) * int(context.scene.range)
+        for i in range(terrainRange):
+            x = random.randrange(round(-terrainRange/20),
+                                 round(terrainRange/20))
+            y = random.randrange(round(-terrainRange/20),
+                                 round(terrainRange/20))
+
+            randFlow = random.randrange(
+                round(terrainRange/16), round(terrainRange/8))
+            if(i % randFlow == 0):
                 genGrass.GenerateGrass.genFlowers(
-                    genGrass, x, y, grassContainer)
-            genGrass.GenerateGrass.genGrass(genGrass, x, y, flowerContainer)
+                    genGrass, x, y, flowerContainer, stemMat, blossomMat)
+            randBushes = random.randrange(
+                round(terrainRange/8), round(terrainRange/4))
+
+            if(i % randBushes == 0):
+                genGrass.GenerateGrass.genBushes(
+                    genGrass, x, y, bushesContainer, bushMat)
+            genGrass.GenerateGrass.genGrass(
+                genGrass, x, y, grassContainer, grassMat)
         return {'FINISHED'}
 
 
@@ -89,7 +133,7 @@ class SimpleOperator(bpy.types.Operator):
     bl_idname = "object.simple_operator"
     bl_label = "Simple Object Operator"
 
-    @classmethod
+    @ classmethod
     def poll(cls, context):
         return context.active_object is not None
 
@@ -109,11 +153,17 @@ classes = [MainPanel, SimpleOperator, GenerateGrass, DeleteAll]
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
+    bpy.types.Scene.range = bpy.props.StringProperty(
+        name="Quadratmeters",
+        description="My description",
+        default="40"
+    )
 
 
 def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
+    del bpy.types.Scene.range
 
 
 if __name__ == "__main__":

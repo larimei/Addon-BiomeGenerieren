@@ -17,33 +17,18 @@ ROT_TIP_MIN = 30
 ROT_TIP_MAX = 90
 ROT_FALLOFF = 5
 
-GRASS_COLOR = (
-    0,
-    0.4,
-    0.1,
-    1
-)
-STEM_COLOR = (
-    0.4,
-    0.1,
-    0,
-    1
-)
-BLOSSOM_COLOR = (
-    1,
-    1,
-    0.6,
-    1
-)
+INCREMENT: int = 0
 
 
 class GenerateGrass ():
-    def genGrass(self, x, y, grassContainer):
+
+    def genGrass(self, x, y, grassContainer, grassMaterial):
 
         grass_mesh = bpy.data.meshes.new("grass_shrub_mesh")
         grass_object = bpy.data.objects.new("grass shrub", grass_mesh)
         grass_object.parent = grassContainer
-        grass_object.color = GRASS_COLOR
+        grass_object.data.materials.append(grassMaterial)
+
         grass_object.location = (x, y, 0)
         # Mesh in aktuelle Collection der Szene verlinken
         bpy.context.collection.objects.link(grass_object)
@@ -56,7 +41,6 @@ class GenerateGrass ():
             """Bringt einen Wert v von einer Skala (from_min, from_max) auf eine neue Skala (to_min, to_max)"""
             return to_min + (v - from_min) * (to_max - to_min) / (from_max - from_min)
         blades = random.randrange(1, 8)
-        print(blades)
         for i in range(blades):
 
             # Zufällige Werte für jedes Blatt generieren
@@ -113,14 +97,13 @@ class GenerateGrass ():
         bm.to_mesh(grass_mesh)
         bm.free()
 
-    def genFlowers(self, _x, _y, flowerContainer):
+    def genFlowers(self, _x, _y, flowerContainer, stemMaterial, blossomMaterial):
 
-        leaves_color = (
-            random.uniform(0, 1),
-            random.uniform(0, 1),
-            random.uniform(0, 1),
-            1  # Alpha-Wert der Farbe (Intransparenz) - soll hier immer 1 sein
-        )
+        leavesMatRnd: bpy.types.Material = bpy.data.materials.new(
+            name="leavesMaterial")
+        leavesMatRnd.use_nodes = True
+        leavesMatRnd.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
+            random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), 1)
 
         bpy.ops.mesh.primitive_cube_add(
             location=(_x, _y, 6), scale=(0.5, 0.5, 0.15))
@@ -134,9 +117,6 @@ class GenerateGrass ():
         if hasattr(bm.faces, "ensure_lookup_table"):
             bm.faces.ensure_lookup_table()
 
-        for i in range(len(bm.faces)):
-            bm.faces[i].select = False
-        bm.faces[1].select = True
         bmesh.ops.translate(
             bm, verts=bm.faces[1].verts, vec=bm.faces[1].normal * 3)
         c = bm.faces[1].calc_center_median()
@@ -159,7 +139,7 @@ class GenerateGrass ():
             angle = i/num * 2 * math.pi - math.pi/2
 
             paddel = bpy.data.objects.new('onePaddel', paddelData)
-            paddel.color = leaves_color
+            paddel.data.materials.append(leavesMatRnd)
             bpy.context.collection.objects.link(paddel)
             paddel.location = (x + _x, y + _y, 6)
             paddel.rotation_euler.z = angle
@@ -170,12 +150,64 @@ class GenerateGrass ():
         bpy.ops.mesh.primitive_ico_sphere_add(
             location=(_x, _y, 6), scale=(1.75, 1.75, 0.5))
 
-        bpy.context.active_object.color = BLOSSOM_COLOR
+        bpy.context.active_object.data.materials.append(blossomMaterial)
         bpy.context.active_object.name = "blossom"
         bpy.context.active_object.parent = flowerParent
         bpy.ops.mesh.primitive_cube_add(
             location=(_x, _y, 2), scale=(0.75, 0.75, 4))
-        bpy.context.active_object.color = STEM_COLOR
+        bpy.context.active_object.data.materials.append(stemMaterial)
         bpy.context.active_object.name = "steam"
         bpy.context.active_object.parent = flowerParent
         flowerParent.parent = flowerContainer
+
+    def genBushes(self, _x, _y, bushesContainer, bushMaterial):
+
+        bpy.ops.mesh.primitive_ico_sphere_add(
+            subdivisions=1, enter_editmode=True, location=(_x, _y, 5), scale=(10, 10, 10))
+
+        bushData = bpy.context.active_object.data
+        bushObject: bpy.types.Object = bpy.context.active_object
+        bushObject.data.materials.append(bushMaterial)
+        bpy.ops.mesh.select_mode(type="VERT")
+        bm = bmesh.from_edit_mesh(bushData)
+
+        if hasattr(bm.verts, "ensure_lookup_table"):
+            bm.verts.ensure_lookup_table()
+
+        bm.verts[0].co += bm.verts[0].normal * -5
+        bpy.ops.object.mode_set(mode='OBJECT')
+        self.INCREMENT += 1
+        if(self.INCREMENT % 2 == 0):
+            bpy.ops.object.duplicate()
+            duplicatedBush: bpy.types.Object = bpy.context.active_object
+            duplicatedBush.location = (10, 10, -1)
+            duplicatedBush.scale = (0.75, 0.75, 0.75)
+            duplicatedBush.parent = bushObject
+            bpy.ops.object.duplicate()
+            duplicatedBush: bpy.types.Object = bpy.context.active_object
+            duplicatedBush.location = (-8, -9, -3)
+            duplicatedBush.scale = (0.5, 0.5, 0.5)
+            duplicatedBush.parent = bushObject
+            bpy.ops.object.duplicate()
+            duplicatedBush: bpy.types.Object = bpy.context.active_object
+            duplicatedBush.location = (5,  -10, -1.67)
+            duplicatedBush.scale = (0.6, 0.6, 0.6)
+            duplicatedBush.parent = bushObject
+            bpy.ops.object.duplicate()
+            duplicatedBush: bpy.types.Object = bpy.context.active_object
+            duplicatedBush.location = (-8,  9, -3)
+            duplicatedBush.scale = (0.5, 0.5, 0.5)
+            duplicatedBush.parent = bushObject
+        else:
+            bpy.ops.object.duplicate()
+            duplicatedBush: bpy.types.Object = bpy.context.active_object
+            duplicatedBush.location = (10, 6, -4)
+            duplicatedBush.scale = (0.35, 0.35, 0.35)
+            duplicatedBush.parent = bushObject
+            bpy.ops.object.duplicate()
+            duplicatedBush: bpy.types.Object = bpy.context.active_object
+            duplicatedBush.location = (-8, -9, -3.35)
+            duplicatedBush.scale = (0.45, 0.45, 0.45)
+            duplicatedBush.parent = bushObject
+        bushObject.rotation_euler = (0, 0, random.randrange(0, 360))
+        bushObject.parent = bushesContainer
