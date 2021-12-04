@@ -113,7 +113,7 @@ class GenerateGrass(bpy.types.Operator):
                                  round(terrainRange/20))
 
             randFlow = random.randrange(
-                round(terrainRange/16), round(terrainRange/8))
+                round(terrainRange/12), round(terrainRange/6))
             if(i % randFlow == 0):
                 genGrass.GenerateGrass.genFlowers(
                     genGrass, x, y, flowerContainer, stemMat, blossomMat)
