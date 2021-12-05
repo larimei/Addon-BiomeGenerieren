@@ -105,6 +105,15 @@ class GenerateGrass(bpy.types.Operator):
         blossomMat.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
             1, 1, 0.6, 1)
 
+        leavesMaterials = [None] * 4
+
+        for i in range(len(leavesMaterials)-1):
+            leavesMaterials[i] = bpy.data.materials.new(
+                name="blossomMaterial")
+            leavesMaterials[i].use_nodes = True
+            leavesMaterials[i].node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
+                random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), 1)
+
         terrainRange: int = int(context.scene.range) * int(context.scene.range)
         for i in range(terrainRange):
             x = random.randrange(round(-terrainRange/20),
@@ -116,7 +125,7 @@ class GenerateGrass(bpy.types.Operator):
                 round(terrainRange/12), round(terrainRange/6))
             if(i % randFlow == 0):
                 genGrass.GenerateGrass.genFlowers(
-                    genGrass, x, y, flowerContainer, stemMat, blossomMat)
+                    genGrass, x, y, flowerContainer, stemMat, blossomMat, leavesMaterials)
             randBushes = random.randrange(
                 round(terrainRange/8), round(terrainRange/4))
 
