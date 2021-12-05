@@ -46,16 +46,34 @@ verts = bm.verts
 num_verts = len(verts)
 for i in range(0, num_verts):
     bm.verts.ensure_lookup_table()
-    #bmesh.ops.scale(bm, vec=(0, 0, 0), space=(mathutils.Matrix.Scale(2,2,2)), verts=[verts[i]]) #????
-    random_angle = random.randrange(0, 20)
-    rot_matrix_blade = mathutils.Matrix.Rotation(math.radians(random_angle),4, 'Z')
-    bmesh.ops.rotate(bm, cent=(0, 0, 0), matrix=rot_matrix_blade, verts=[verts[i]])
+    #bmesh.ops.scale(bm, vec=(1, 1, 1), space=(mathutils.Matrix.Scale(0.5, 4, (0.0, 0.0, 1.0))), verts=[verts[i]]) #????
+    random_angle = random.randrange(0, 120)
+    rot_matrix_blade = mathutils.Matrix.Rotation(math.radians(random_angle),3, 'Z')
+    bmesh.ops.rotate(bm, cent=verts[i].co, matrix=rot_matrix_blade, verts=[verts[i]])
     bm.verts.ensure_lookup_table()
 
 bmesh.update_edit_mesh(me, True)
 
 bpy.ops.object.editmode_toggle()
 
-bpy.ops.object.modifier_add(type='SKIN')
+skin: bpy.types.SkinModifier = bpy.ops.object.modifier_add(type='SKIN')
+
+rad_x = 1.5
+rad_y = 1.5
+
+i = 0
+
+for v in me.skin_vertices[0].data:
+    v.radius = rad_x, rad_y
+    if i is 0:
+        rad_x = random.uniform(0.65,0.85)
+        rad_y = random.uniform(0.65,0.85)
+    else:
+        rad_x = rad_x - random.uniform(0.02,0.05)
+        rad_y = rad_y - random.uniform(0.025, 0.055)
+#aus modifier ziehen
+#+ subdivision
+bpy.ops.object.modifier_add(type='SUBSURF')
+bpy.context.object.modifiers["Subdivision"].render_levels = 1
 
 leaves = bpy.ops.mesh.primitive_ico_sphere_add(radius=random.uniform(1,1.2), enter_editmode=False, align='WORLD', location=(posX, posY, posZ + 2), scale=(random.uniform(2.5,5), random.uniform(2.5,5), random.uniform(6,8)))

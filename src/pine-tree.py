@@ -1,10 +1,23 @@
 import bmesh
+from bmesh.types import BMFaceSeq
 import bpy
+import random
 
 
+AMOUNT = 5
+HEIGHT = AMOUNT / 2.2
 
-def generateCylinder(location, scale, width_scale_top, width_scale_bottom):
+def generateCylinder(location, scale, width_scale_top, width_scale_bottom, trunk):
     mesh = bpy.ops.mesh.primitive_cylinder_add(vertices=6, enter_editmode=False, align='WORLD', location=location, scale=scale)
+    #rotate
+    
+    if not trunk:
+        bpy.ops.transform.rotate(value=random.uniform(-1, 1), orient_axis='Z', orient_type='GLOBAL', orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)), orient_matrix_type='GLOBAL', constraint_axis=(False, False, True), mirror=True, use_proportional_edit=False, proportional_edit_falloff='SMOOTH', proportional_size=1, use_proportional_connected=False, use_proportional_projected=False)
+        bpy.ops.transform.rotate(value=random.uniform(-0.08, 0.08), orient_axis='Y', orient_type='GLOBAL', orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)), orient_matrix_type='GLOBAL', constraint_axis=(False, True, False), mirror=True, use_proportional_edit=False, proportional_edit_falloff='SMOOTH', proportional_size=1, use_proportional_connected=False, use_proportional_projected=False)
+        bpy.ops.transform.rotate(value=random.uniform(-0.08, 0.08), orient_axis='X', orient_type='GLOBAL', orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)), orient_matrix_type='GLOBAL', constraint_axis=(True, False, False), mirror=True, use_proportional_edit=False, proportional_edit_falloff='SMOOTH', proportional_size=1, use_proportional_connected=False, use_proportional_projected=False)
+
+
+
     col = bpy.data.collections.get("Collection")
     # Get the active mesh
     mesh = bpy.context.object
@@ -22,24 +35,47 @@ def generateCylinder(location, scale, width_scale_top, width_scale_bottom):
     bm = bmesh.from_edit_mesh(mesh.data)
 
     bm.faces.ensure_lookup_table()
-    face_top = bm.faces[4]
-    if isinstance(face_top, bmesh.types.BMFace):
-        c = face_top.calc_center_median()
-        for v in face_top.verts:
-            v.co = c + width_scale_top * (v.co - c)
-    face_bottom = bm.faces[7]
-    if isinstance(face_top, bmesh.types.BMFace):
-        c = face_bottom.calc_center_median()
-        for v in face_bottom.verts:
-            v.co = c + width_scale_bottom * (v.co - c)
+
+    for i in range(0, 8):
+        face: BMFaceSeq = bm.faces[i]
+        if i is 4:
+            scale = width_scale_top
+        elif i is 7:
+            scale = width_scale_bottom
+        else:
+            scale = random.uniform(0.9,1.1)                
+            
+        if isinstance(face, bmesh.types.BMFace):
+           c = face.calc_center_median()
+           for v in face.verts:
+               v.co = c + scale * (v.co - c)
+
+        #face.select = True
+        #bpy.ops.mesh.knife_tool(use_occlude_geometry=True, only_selected=False)       
+        
 
     bmesh.update_edit_mesh(mesh.data)
+
+    
+    
+
     
     bpy.ops.object.editmode_toggle()
 
 
-generateCylinder((0,0,0), (1,1,0.75), 0.6, 1)
-generateCylinder((0,0,0.5), (1,1,0.8), 0.6, 2.3)
-generateCylinder((0,0,1), (1,1,0.8), 0.5, 2)
-generateCylinder((0,0,1.5), (1,1,0.8), 0.4, 1.5)
-generateCylinder((0,0,2), (1,1,0.8), 0.1, 1)
+top = AMOUNT * 0.2
+bottom = AMOUNT * 0.55
+
+for i in range(0, AMOUNT + 1):
+    if i is 0:
+        generateCylinder((0,0,0), (1,1,0.75), 0.6, 1, True)
+    else:
+        if i is AMOUNT:
+            generateCylinder((0,0,HEIGHT * i / AMOUNT), (1,1,0.8), 0.07, bottom, False)
+        else:
+            generateCylinder((0,0,HEIGHT * i / AMOUNT), (1,1,0.8), top, bottom, False)
+            top = top - 0.2
+            bottom = bottom-0.4
+            
+        
+        
