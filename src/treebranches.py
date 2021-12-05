@@ -14,11 +14,11 @@ leavePositions = []
 def generateBranches(edges, verts, vert, branch, newBranch, lastIndex):
     for i in range(random.randrange(3, 5)):
         if branch:
-            branchvert = (vert[0] + random.uniform(0, 1), vert[1] +
-                          random.uniform(0, 1), vert[2] + random.uniform(0, 1))
+            branchvert = (vert[0] + random.uniform(0.2, 0.8), vert[1] +
+                          random.uniform(0.2, 0.8), vert[2] + random.uniform(0.2, 0.8))
         elif branch is False:
-            branchvert = (vert[0] + random.uniform(-1, 0), vert[1] +
-                          random.uniform(-1, 0), vert[2] + random.uniform(0, 1))
+            branchvert = (vert[0] + random.uniform(-0.8, -0.2), vert[1] +
+                          random.uniform(-0.8, -0.2), vert[2] + random.uniform(0.2, 0.8))
         """ elif branch is 3:
             branchVert = (vert[0] + random.uniform(-1,0), vert[1] + random.uniform(0,1), vert[2] + random.uniform(0,1))
         elif branch is 4:
@@ -101,6 +101,7 @@ def generateTreeWithBranches():
 
     skin: bpy.types.SkinModifier = bpy.ops.object.modifier_add(type='SKIN')
 
+        
     rad_x = 1.5
     rad_y = 1.5
 
@@ -118,8 +119,17 @@ def generateTreeWithBranches():
 
     bpy.ops.object.modifier_add(type='SUBSURF')
     bpy.context.object.modifiers["Subdivision"].render_levels = 1
+    
+    for modifier in obj.modifiers:
+        bpy.ops.object.modifier_apply(modifier=modifier.name)
+
 
     generateLeaves()
+
+    bpy.ops.object.select_all(action='SELECT')
+    bpy.ops.object.join()
+
+
 
 
 class TreeBranches(bpy.types.Operator):
