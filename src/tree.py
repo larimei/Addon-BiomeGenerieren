@@ -74,6 +74,7 @@ def generateTree():
         else:
             rad_x = rad_x - random.uniform(0.02, 0.05)
             rad_y = rad_y - random.uniform(0.025, 0.055)
+        i = i + 1
 
     bpy.ops.object.modifier_add(type='SUBSURF')
     bpy.context.object.modifiers["Subdivision"].render_levels = 1
