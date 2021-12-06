@@ -48,37 +48,20 @@ class Ground:
         ground_mesh.from_mesh(ground.data)
         ground_mesh.verts.ensure_lookup_table()
 
-        v = Voronoi()
-        arrays = v.get_voronoi_arrays(self.biome_total,
-                                      self.BIOME_AMOUNT, self.VERTCOUNT_EDGE)
-        weights = arrays[1]
-        print(len(ground_mesh.verts))
-        print(len(weights))
+        v = VoronoiUtils(2)
+        hn = HeightNoise(2)
         for i in range(len(ground_mesh.verts)):
-            ground_mesh.verts[i].co.z = weights[i]
+            vert = ground_mesh.verts[i].co
+            info = v.get_biome_and_weight(vert.x, vert.y)
+            biome = info[0]
+            print(biome)
+            weight = info[1]
+            height = hn.get_height(vert.x, vert.y)
+            vert.z = 2 * height + 3 * weight * height
            # print(ground_mesh.verts[i].co)
 
         ground_mesh.to_mesh(ground.data)
         ground_mesh.free()
-        # bpy.ops.texture.new()
-        # tex_clr = bpy.data.textures["Texture"]
-        # tex_clr.name = "Voronoi"
-        # tex_clr.type = 'VORONOI'
-        # voronoi_clr: bpy.types.VoronoiTexture = bpy.data.textures["Voronoi"]
-        # voronoi_clr.distance_metric = 'DISTANCE_SQUARED'
-        # voronoi_clr.color_mode = 'POSITION'
-        # voronoi_clr.noise_scale = 1
-        # bpy.ops.texture.new()
-        # tex_int = bpy.data.textures["Texture"]
-        # tex_int.name = "Voronoi2"
-        # tex_int.type = 'VORONOI'
-        # voronoi_int: bpy.types.VoronoiTexture = bpy.data.textures["Voronoi2"]
-        # voronoi_int.distance_metric = 'DISTANCE_SQUARED'
-        # voronoi_int.color_mode = 'INTENSITY'
-        # voronoi_int.noise_scale = 1
-
-        # for val in voronoi_clr.evaluate([0.1, 0.2, 0.2]):
-        #     print(val)
 
 
 class Biome:
@@ -94,76 +77,47 @@ class BiomeVertex:
         self.y = y
 
 
-class Voronoi:
+class VoronoiUtils:
 
-    def get_voronoi_arrays(self, biome_total, biome_amount, size):
-        random.seed()
-        points = []
-        colors = []
-        vertices = []
-        weights = []
-        for i in range(biome_total):
-            point = np.array(
-                ((random.randrange(0, size), random.randrange(0, size))))
-            points.append(point)
-        for i in range(biome_amount):
-            color = i
-            colors.append(color)
+    def __init__(self, scale: float):
+        bpy.ops.texture.new()
+        tex_clr = bpy.data.textures["Texture"]
+        tex_clr.name = "Voronoi"
+        tex_clr.type = 'VORONOI'
+        self.voronoi_clr: bpy.types.VoronoiTexture = bpy.data.textures["Voronoi"]
+        self.voronoi_clr.distance_metric = 'DISTANCE_SQUARED'
+        self.voronoi_clr.color_mode = 'POSITION'
+        self.voronoi_clr.noise_scale = scale
 
-        for y in range(size):
-            for x in range(size):
-                distance: float = size * size
-                distance2nd: float = size * size
-                value = 0
-                weight: float = 0
-                # calc closest point with distance
-                for i in range(len(points)):
-                    if(numpy.linalg.norm(np.array((x, y)) - points[i]) < distance):
-                        distance = numpy.linalg.norm(
-                            np.array((x, y)) - points[i])
-                        value = i
-                # calc weight using distance from closest to 2nd closest point
-                for i in range(len(points)):
-                    if(i != value):
-                        pos_vert = np.array((x, y))
-                        pos_1 = points[i]
-                        pos_0 = points[value]
-                        vector_pos0_pos1 = pos_1 - pos_0
-                        vector_pos0_vert = pos_vert - pos_0
-                        # project vector from current point to closest point on vector from closest point to 2nd closest point
-                        # this results in a weight based on the distance from the closest point,
-                        # the edges of the biome will always have the value 0
-                        # the center of the biome will have the value of 1
-                        v_norm = np.sqrt(sum(vector_pos0_pos1**2))
-                        projection = (
-                            np.dot(vector_pos0_vert, vector_pos0_pos1)/v_norm**2)*vector_pos0_pos1
-                        if(numpy.linalg.norm(pos_vert - pos_1) < distance2nd):
-                            distance2nd = numpy.linalg.norm(
-                                pos_vert - pos_1)
-                            distance_projected_to_first = numpy.linalg.norm(
-                                projection)
-                            distance_first_to_2nd = numpy.linalg.norm(
-                                vector_pos0_pos1)
-                            # print(projection)
-                            # print(vector_pos0_pos1)
-                            print(distance_first_to_2nd -
-                                  distance_projected_to_first)
-                            weight = (distance_projected_to_first /
-                                      distance_first_to_2nd) * 2
+    def get_biome_and_weight(self, x, y):
+        colors = self.voronoi_clr.evaluate([x, y, 0])
+        color = colors[0]
+        weight = 0
+        biome = 0
+        if color >= 0.75:
+            biome = 3
+            weight = (colors[3] - 1) * (-1)
+        elif color >= 0.5:
+            biome = 2
+        elif color >= 0.25:
+            biome = 1
+        return biome, weight
 
-                index = (x+y*size)
-                if(index < 210):
-                    print("index: ")
-                    print(index)
-                    print("color: ")
-                    print((value % biome_amount))
-                    print("weight")
-                    print(weight)
 
-                vertices.append(colors[value % biome_amount])
-                weights.append(weight)
+class HeightNoise:
 
-        return vertices, weights
+    def __init__(self, scale: float):
+        bpy.ops.texture.new()
+        tex_clr = bpy.data.textures["Texture"]
+        tex_clr.name = "Cloud"
+        tex_clr.type = 'CLOUDS'
+        self.cloud: bpy.types.CloudsTexture = bpy.data.textures["Cloud"]
+        self.cloud.noise_basis = 'BLENDER_ORIGINAL'
+        self.cloud.cloud_type = 'GRAYSCALE'
+        self.cloud.noise_scale = scale
+
+    def get_height(self, x, y):
+        return self.cloud.evaluate([x, y, 0])[3]
 
 
 classes = [SimpleOperator]
