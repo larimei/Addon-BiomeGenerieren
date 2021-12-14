@@ -5,7 +5,23 @@ import random
 
 
 AMOUNT = 5
-HEIGHT = AMOUNT / 2.2
+HEIGHT = AMOUNT / 2.2 #0A2E1E
+
+def create_leave_material() -> bpy.types.Material:
+        mat_leave: bpy.types.Material = bpy.data.materials.new("Leave Material")
+        mat_leave.use_nodes = True
+        nodes_leave: typing.List[bpy.types.Node] = mat_leave.node_tree.nodes
+        nodes_leave["Principled BSDF"].inputs[0].default_value = [0.009, 0.141, 0.058, 1.000000]
+
+        return mat_leave
+
+def create_trunk_material() -> bpy.types.Material:
+        mat_trunk: bpy.types.Material = bpy.data.materials.new("Trunk Material")
+        mat_trunk.use_nodes = True
+        nodes_leave: typing.List[bpy.types.Node] = mat_trunk.node_tree.nodes
+        nodes_leave["Principled BSDF"].inputs[0].default_value = [0.051, 0.010, 0.00, 1.000000]
+
+        return mat_trunk
 
 def generateCylinder(location, scale, width_scale_top, width_scale_bottom, trunk):
     mesh = bpy.ops.mesh.primitive_cylinder_add(vertices=6, enter_editmode=False, align='WORLD', location=location, scale=scale)
@@ -55,8 +71,7 @@ def generateCylinder(location, scale, width_scale_top, width_scale_bottom, trunk
         
 
     bmesh.update_edit_mesh(mesh.data)
-
-    
+  
     
 
     
@@ -69,6 +84,7 @@ bottom = AMOUNT * 0.55
 for i in range(0, AMOUNT + 1):
     if i is 0:
         generateCylinder((0,0,0), (1,1,0.75), 0.6, 1, True)
+        bpy.context.object.data.materials.append(create_trunk_material()) 
     else:
         if i is AMOUNT:
             generateCylinder((0,0,HEIGHT * i / AMOUNT), (1,1,0.8), 0.07, bottom, False)
@@ -76,6 +92,7 @@ for i in range(0, AMOUNT + 1):
             generateCylinder((0,0,HEIGHT * i / AMOUNT), (1,1,0.8), top, bottom, False)
             top = top - 0.2
             bottom = bottom-0.4
+        bpy.context.object.data.materials.append(create_leave_material()) 
             
         
         

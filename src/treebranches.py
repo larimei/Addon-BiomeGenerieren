@@ -1,3 +1,4 @@
+import typing
 import bpy
 import random
 import bmesh
@@ -51,10 +52,28 @@ def generateLeaves():
     for pos in leavePositions:
         if pos is leavePositions[len(leavePositions) - 1]:
             leaves = bpy.ops.mesh.primitive_ico_sphere_add(radius=random.uniform(2, 2.7), enter_editmode=False, align='WORLD', location=(
-            pos[0], pos[1], pos[2] + 1.2), scale=(random.uniform(2, 3), random.uniform(2, 3), random.uniform(1.7, 2.5)))
+            pos[0], pos[1], pos[2] + 1.6), scale=(random.uniform(2, 3), random.uniform(2, 3), random.uniform(1.7, 2.5)))
+            bpy.context.object.data.materials.append(create_leave_material())
         else:
             leaves = bpy.ops.mesh.primitive_ico_sphere_add(radius=random.uniform(1, 1.2), enter_editmode=False, align='WORLD', location=(
             pos[0], pos[1], pos[2]), scale=(random.uniform(2, 3), random.uniform(2, 3), random.uniform(2, 3)))
+            bpy.context.object.data.materials.append(create_leave_material())
+
+def create_leave_material() -> bpy.types.Material:
+        mat_leave: bpy.types.Material = bpy.data.materials.new("Leave Material")
+        mat_leave.use_nodes = True
+        nodes_leave: typing.List[bpy.types.Node] = mat_leave.node_tree.nodes
+        nodes_leave["Principled BSDF"].inputs[0].default_value = [0.03, 0.6, 0.04, 1.000000]
+
+        return mat_leave
+
+def create_trunk_material() -> bpy.types.Material:
+        mat_trunk: bpy.types.Material = bpy.data.materials.new("Trunk Material")
+        mat_trunk.use_nodes = True
+        nodes_leave: typing.List[bpy.types.Node] = mat_trunk.node_tree.nodes
+        nodes_leave["Principled BSDF"].inputs[0].default_value = [0.279, 0.122, 0.01, 1.000000]
+
+        return mat_trunk
 
 def generateMoreTrunk(edges, verts, vert):
     for i in range(0,3):
@@ -152,6 +171,8 @@ def generateTreeWithBranches():
 
     bpy.ops.object.modifier_add(type='SUBSURF')
     bpy.context.object.modifiers["Subdivision"].render_levels = 1
+
+    bpy.context.object.data.materials.append(create_trunk_material())
     
     #for modifier in obj.modifiers:
         #bpy.ops.object.modifier_apply(modifier=modifier.name)

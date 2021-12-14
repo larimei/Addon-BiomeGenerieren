@@ -4,6 +4,22 @@ import bmesh
 import mathutils
 import math
 
+def create_leave_material() -> bpy.types.Material:
+        mat_leave: bpy.types.Material = bpy.data.materials.new("Leave Material")
+        mat_leave.use_nodes = True
+        nodes_leave: typing.List[bpy.types.Node] = mat_leave.node_tree.nodes
+        nodes_leave["Principled BSDF"].inputs[0].default_value = [0.038, 0.7, 0.05, 1.000000]
+
+        return mat_leave
+
+def create_trunk_material() -> bpy.types.Material:
+        mat_trunk: bpy.types.Material = bpy.data.materials.new("Trunk Material")
+        mat_trunk.use_nodes = True
+        nodes_leave: typing.List[bpy.types.Node] = mat_trunk.node_tree.nodes
+        nodes_leave["Principled BSDF"].inputs[0].default_value = [0.3, 0.152, 0.02, 1.000000]
+
+        return mat_trunk
+
 
 def generateTree():
 
@@ -78,9 +94,11 @@ def generateTree():
 
     bpy.ops.object.modifier_add(type='SUBSURF')
     bpy.context.object.modifiers["Subdivision"].render_levels = 1
+    bpy.context.object.data.materials.append(create_trunk_material())
 
     leaves = bpy.ops.mesh.primitive_ico_sphere_add(radius=random.uniform(1, 1.2), enter_editmode=False, align='WORLD', location=(
     posX, posY, posZ + 2), scale=(random.uniform(2.5, 5), random.uniform(2.5, 5), random.uniform(6, 8)))
+    bpy.context.object.data.materials.append(create_leave_material())
 
 
 class Tree(bpy.types.Operator):
