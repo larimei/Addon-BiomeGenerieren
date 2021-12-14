@@ -116,7 +116,7 @@ class GenerateGrass(bpy.types.Operator):
             leavesMaterials[i].node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
                 random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), 1)
 
-        terrainRange: int = int(context.scene.range)
+        terrainRange: int = int(context.scene.range) / 2
         terrainBuildFactor: int = int(terrainRange*10)
         for i in range(terrainBuildFactor):
             # range from x to y
