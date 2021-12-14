@@ -106,6 +106,8 @@ class GenerateGrass(bpy.types.Operator):
             1, 1, 0.6, 1)
 
         leavesMaterials = [None] * 4
+        grassArray = genGrass.GenerateGrass.createGrassArray(
+            genGrass, grassMat)
 
         for i in range(len(leavesMaterials)-1):
             leavesMaterials[i] = bpy.data.materials.new(
@@ -114,26 +116,29 @@ class GenerateGrass(bpy.types.Operator):
             leavesMaterials[i].node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
                 random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), 1)
 
-        terrainRange: int = int(context.scene.range) * int(context.scene.range)
-        for i in range(terrainRange):
-            x = random.randrange(round(-terrainRange/20),
-                                 round(terrainRange/20))
-            y = random.randrange(round(-terrainRange/20),
-                                 round(terrainRange/20))
-
+        terrainRange: int = int(context.scene.range)
+        terrainBuildFactor: int = int(terrainRange*10)
+        for i in range(terrainBuildFactor):
+            # range from x to y
+            x = random.randrange(round(-terrainRange),
+                                 round(terrainRange))
+            y = random.randrange(round(-terrainRange),
+                                 round(terrainRange))
+            # rand flower creation
             randFlow = random.randrange(
-                round(terrainRange/12), round(terrainRange/6))
+                round(terrainBuildFactor/12), round(terrainBuildFactor/6))
             if(i % randFlow == 0):
                 genGrass.GenerateGrass.genFlowers(
                     genGrass, x, y, flowerContainer, stemMat, blossomMat, leavesMaterials)
+            # rand bushes creation
             randBushes = random.randrange(
-                round(terrainRange/8), round(terrainRange/4))
-
+                round(terrainBuildFactor/8), round(terrainBuildFactor/4))
             if(i % randBushes == 0):
                 genGrass.GenerateGrass.genBushes(
                     genGrass, x, y, bushesContainer, bushMat)
+            # rand grass creation
             genGrass.GenerateGrass.genGrass(
-                genGrass, x, y, grassContainer, grassMat)
+                genGrass, x, y, grassArray, grassContainer)
         return {'FINISHED'}
 
 
