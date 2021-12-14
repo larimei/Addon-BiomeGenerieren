@@ -4,7 +4,7 @@ import bmesh
 import mathutils
 import math
 
-VERTICES = 10
+VERTICES = 7
 MIN_SHIFT = 0.9
 MAX_SHIFT = 1.1
 
@@ -12,6 +12,7 @@ leavePositions = []
 
 
 def generateBranches(edges, verts, vert, branch, newBranch, lastIndex):
+    bool = False
     for i in range(random.randrange(3, 5)):
         if branch:
             branchvert = (vert[0] + random.uniform(0.2, 0.8), vert[1] +
@@ -29,9 +30,17 @@ def generateBranches(edges, verts, vert, branch, newBranch, lastIndex):
         if i is 0:
             edge = (lastIndex - 1, len(verts) - 1)
         else:
-            edge = (len(verts) - 2, len(verts) - 1)
+            if bool:
+                edge = (lastIndex, len(verts) -1)   
+                bool = False
+            else:
+                edge = (len(verts) - 2, len(verts) -1)
 
         edges.append(edge)
+        """ if i is 2 and newBranch:
+                lastIndex = len(verts) - 1
+                generateBranches(edges, verts, vert, not branch, False, lastIndex)
+                bool = True """
 
         """  if newBranch and i is not 0:
              generateBranches(edges, verts, branchvert, not branch, False, len(verts) -1 )
@@ -40,8 +49,28 @@ def generateBranches(edges, verts, vert, branch, newBranch, lastIndex):
 
 def generateLeaves(): 
     for pos in leavePositions:
-        leaves = bpy.ops.mesh.primitive_ico_sphere_add(radius=random.uniform(1, 1.2), enter_editmode=False, align='WORLD', location=(
-           pos[0], pos[1], pos[2]), scale=(random.uniform(2, 3), random.uniform(2, 3), random.uniform(2, 3)))
+        if pos is leavePositions[len(leavePositions) - 1]:
+            leaves = bpy.ops.mesh.primitive_ico_sphere_add(radius=random.uniform(2, 2.7), enter_editmode=False, align='WORLD', location=(
+            pos[0], pos[1], pos[2] + 1.2), scale=(random.uniform(2, 3), random.uniform(2, 3), random.uniform(1.7, 2.5)))
+        else:
+            leaves = bpy.ops.mesh.primitive_ico_sphere_add(radius=random.uniform(1, 1.2), enter_editmode=False, align='WORLD', location=(
+            pos[0], pos[1], pos[2]), scale=(random.uniform(2, 3), random.uniform(2, 3), random.uniform(2, 3)))
+
+def generateMoreTrunk(edges, verts, vert):
+    for i in range(0,3):
+        posZ = vert[2] + 0.6
+        posY = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT)
+        posX = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT)
+        vert = (posX, posY, posZ)
+        verts.append(vert)
+        if i is not 0:
+            edge = (len(verts)-2, len(verts)-1)
+            edges.append(edge)
+        else:
+            edge = (VERTICES - 1, len(verts) - 1)
+            edges.append(edge)
+    leavePositions.append(vert)
+
 
    
 
@@ -56,6 +85,7 @@ def generateTreeWithBranches():
 
     verts = []
     edges = []
+    verts_trunk = []
 
     for i in range(VERTICES):
         posZ = i * 0.6
@@ -63,12 +93,14 @@ def generateTreeWithBranches():
         posX = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT)
         vert = (posX, posY, posZ)
         verts.append(vert)
+        verts_trunk.append(vert)
         if i is not 0:
             edge = (i-1, i)
             edges.append(edge)
 
     generateBranches(edges, verts, vert, True, True, VERTICES)
     generateBranches(edges, verts, vert, False, False, VERTICES)
+    generateMoreTrunk(edges, verts, vert)
 
     faces = []
 
@@ -108,26 +140,27 @@ def generateTreeWithBranches():
     i = 0
 
     for v in me.skin_vertices[0].data:
-        v.radius = rad_x, rad_y
-        if i is 0:
-            rad_x = random.uniform(0.65, 0.85)
-            rad_y = random.uniform(0.65, 0.85)
-        else:
-            rad_x = rad_x - random.uniform(0.02, 0.05)
-            rad_y = rad_y - random.uniform(0.025, 0.055)
-        i = i + 1
+        if i < len(verts_trunk) - 1:
+            v.radius = rad_x, rad_y
+            if i is 0:
+                rad_x = random.uniform(0.65, 0.85)
+                rad_y = random.uniform(0.65, 0.85)
+            else:
+                rad_x = rad_x - random.uniform(0.02, 0.05)
+                rad_y = rad_y - random.uniform(0.025, 0.055)
+            i = i + 1
 
     bpy.ops.object.modifier_add(type='SUBSURF')
     bpy.context.object.modifiers["Subdivision"].render_levels = 1
     
-    for modifier in obj.modifiers:
-        bpy.ops.object.modifier_apply(modifier=modifier.name)
+    #for modifier in obj.modifiers:
+        #bpy.ops.object.modifier_apply(modifier=modifier.name)
 
 
     generateLeaves()
 
-    bpy.ops.object.select_all(action='SELECT')
-    bpy.ops.object.join()
+    #bpy.ops.object.select_all(action='SELECT')
+    #bpy.ops.object.join()
 
 
 
