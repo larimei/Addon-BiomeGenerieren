@@ -1,8 +1,7 @@
+
 import bpy
 import bmesh
 import random
-import numpy.linalg
-import numpy as np
 # bpy.ops.object.select_all(action='SELECT')
 # bpy.ops.object.delete(use_global=False, confirm=False)
 # bpy.ops.outliner.orphans_purge()
@@ -26,9 +25,9 @@ class SimpleOperator(bpy.types.Operator):
 
 class Ground:
     # these should be initialized with input
-    ground_size = 20
+    ground_size = 80
     face_edge_size = 0.5
-    biome_total = 4
+    biome_scale = 20
 
     # constants
     SUBDIVISION_LEVELS = ground_size / face_edge_size - 1
@@ -48,17 +47,30 @@ class Ground:
         ground_mesh.from_mesh(ground.data)
         ground_mesh.verts.ensure_lookup_table()
 
-        v = VoronoiUtils(2)
-        hn = HeightNoise(2)
+        v = VoronoiNoise(scale=self.biome_scale)
+        hn = GlobalNoise(scale=2)
+        mn = MountainNoise(scale=0.4, distortion=1.2)
         for i in range(len(ground_mesh.verts)):
             vert = ground_mesh.verts[i].co
             info = v.get_biome_and_weight(vert.x, vert.y)
             biome = info[0]
             print(biome)
             weight = info[1]
-            height = hn.get_height(vert.x, vert.y)
-            vert.z = 2 * height + 3 * weight * height
-           # print(ground_mesh.verts[i].co)
+            global_height = hn.get_height(vert.x, vert.y)
+            # grass
+            if biome == 0:
+                vert.z = 2 * global_height + 3 * weight * global_height
+            # forest
+            elif biome == 1:
+                vert.z = 2 * global_height + 3 * weight * global_height
+            #desert
+            elif biome == 2:
+                vert.z = 2 * global_height + 3 * weight * global_height
+            # mountains
+            else :
+                mtn_height = mn.get_height(vert.x, vert.y)
+                vert.z = 2 * global_height + 3 * weight * mtn_height
+
 
         ground_mesh.to_mesh(ground.data)
         ground_mesh.free()
@@ -77,7 +89,7 @@ class BiomeVertex:
         self.y = y
 
 
-class VoronoiUtils:
+class VoronoiNoise:
 
     def __init__(self, scale: float):
         bpy.ops.texture.new()
@@ -104,7 +116,7 @@ class VoronoiUtils:
         return biome, weight
 
 
-class HeightNoise:
+class GlobalNoise:
 
     def __init__(self, scale: float):
         bpy.ops.texture.new()
@@ -119,6 +131,20 @@ class HeightNoise:
     def get_height(self, x, y):
         return self.cloud.evaluate([x, y, 0])[3]
 
+class MountainNoise:
+
+    def __init__(self, scale: float, distortion: float):
+        bpy.ops.texture.new()
+        tex_clr = bpy.data.textures["Texture"]
+        tex_clr.name = "Mountain"
+        tex_clr.type = 'DISTORTED_NOISE'
+        self.mountain: bpy.types.DistortedNoiseTexture = bpy.data.textures["Mountain"]
+        self.mountain.noise_distortion = 'IMPROVED_PERLIN'
+        self.mountain.noise_scale = scale
+        self.mountain.distortion = distortion
+
+    def get_height(self, x, y):
+        return self.mountain.evaluate([x, y, 0])[3]
 
 classes = [SimpleOperator]
 
