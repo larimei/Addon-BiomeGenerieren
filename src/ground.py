@@ -40,6 +40,10 @@ class Ground:
     BIOME_AMOUNT = 4
     # others
     faces = []
+    grass_faces = []
+    forest_faces = []
+    desert_faces = []
+    mountain_faces = []
 
     def generate_ground(self, context):
         bpy.ops.mesh.primitive_plane_add(
@@ -92,6 +96,19 @@ class Ground:
 
         ground_mesh.to_mesh(ground.data)
         ground_mesh.free()
+        self.allocate_biomes()
+
+    def allocate_biomes(self):
+        for face in self.faces:
+            for biome in face.biomes:
+                if biome == 0:
+                    self.grass_faces.append(face)
+                if biome == 1:
+                    self.forest_faces.append(face)
+                if biome == 2:
+                    self.desert_faces.append(face)
+                if biome == 3:
+                    self.mountain_faces.append(face)
 
 
 class Biome:
