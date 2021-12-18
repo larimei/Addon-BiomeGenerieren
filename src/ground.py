@@ -25,14 +25,21 @@ class SimpleOperator(bpy.types.Operator):
 
 class Ground:
     # these should be initialized with input
+
+    # int
     ground_size = 80
+    biome_offset_x = 10
+    biome_offset_y = 10
+    # float
     face_edge_size = 0.5
     biome_scale = 20
 
-    # constants
+    # constants that are effected by input
     SUBDIVISION_LEVELS = ground_size / face_edge_size - 1
     VERTCOUNT_EDGE = round(SUBDIVISION_LEVELS + 2)
     BIOME_AMOUNT = 4
+    # others
+    faces = []
 
     def generate_ground(self, context):
         bpy.ops.mesh.primitive_plane_add(
@@ -52,9 +59,9 @@ class Ground:
         mn = MountainNoise(scale=0.4, distortion=1.2)
         for i in range(len(ground_mesh.verts)):
             vert = ground_mesh.verts[i].co
-            info = v.get_biome_and_weight(vert.x, vert.y)
+            info = v.get_biome_and_weight(
+                vert.x + self.biome_offset_x, vert.y + self.biome_offset_y)
             biome = info[0]
-            print(biome)
             weight = info[1]
             global_height = hn.get_height(vert.x, vert.y)
             # grass
@@ -63,14 +70,25 @@ class Ground:
             # forest
             elif biome == 1:
                 vert.z = 2 * global_height + 3 * weight * global_height
-            #desert
+            # desert
             elif biome == 2:
                 vert.z = 2 * global_height + 3 * weight * global_height
             # mountains
-            else :
+            else:
                 mtn_height = mn.get_height(vert.x, vert.y)
-                vert.z = 2 * global_height + 3 * weight * mtn_height
-
+                #vert.z = 2 * global_height + 3 * weight * mtn_height
+                vert.z = weight * weight
+            linked_faces = ground_mesh.verts[i].link_faces
+            for j in range(len(linked_faces)):
+                current_face = linked_faces[j]
+                face: BiomeFace = next(
+                    (x for x in self.faces if x.index == current_face.index), None)
+                if(face is not None):
+                    face.biomes.append(biome)
+                else:
+                    new_face: BiomeFace = BiomeFace(index=current_face.index, biomes=[
+                        biome], center=current_face.calc_center_median, normal=current_face.normal)
+                    self.faces.append(new_face)
 
         ground_mesh.to_mesh(ground.data)
         ground_mesh.free()
@@ -82,11 +100,12 @@ class Biome:
         # self.material
 
 
-class BiomeVertex:
-    def __init__(self, x, y, biome):
-        self.biome = biome
-        self.x = x
-        self.y = y
+class BiomeFace:
+    def __init__(self, index, biomes, center, normal):
+        self.biomes = biomes
+        self.index = index
+        self.center = center
+        self.normal = normal
 
 
 class VoronoiNoise:
@@ -97,18 +116,29 @@ class VoronoiNoise:
         tex_clr.name = "Voronoi"
         tex_clr.type = 'VORONOI'
         self.voronoi_clr: bpy.types.VoronoiTexture = bpy.data.textures["Voronoi"]
-        self.voronoi_clr.distance_metric = 'DISTANCE_SQUARED'
+        self.voronoi_clr.distance_metric = 'MINKOVSKY_FOUR'
         self.voronoi_clr.color_mode = 'POSITION'
         self.voronoi_clr.noise_scale = scale
 
+        bpy.ops.texture.new()
+        tex_weight = bpy.data.textures["Texture"]
+        tex_weight.name = "Weight"
+        tex_weight.type = 'VORONOI'
+        self.voronoi_weight: bpy.types.VoronoiTexture = bpy.data.textures["Weight"]
+        self.voronoi_weight.distance_metric = 'DISTANCE_SQUARED'
+        self.voronoi_weight.color_mode = 'POSITION'
+        self.voronoi_weight.noise_scale = scale
+
     def get_biome_and_weight(self, x, y):
         colors = self.voronoi_clr.evaluate([x, y, 0])
-        color = colors[0]
+        weights = self.voronoi_weight.evaluate([x, y, 0])
+        color = colors[1]
         weight = 0
         biome = 0
         if color >= 0.75:
             biome = 3
-            weight = (colors[3] - 1) * (-1)
+            weight = (weights[3] - 1) * (-1)
+            weight = (weight * weight) * 2
         elif color >= 0.5:
             biome = 2
         elif color >= 0.25:
@@ -131,6 +161,7 @@ class GlobalNoise:
     def get_height(self, x, y):
         return self.cloud.evaluate([x, y, 0])[3]
 
+
 class MountainNoise:
 
     def __init__(self, scale: float, distortion: float):
@@ -145,6 +176,7 @@ class MountainNoise:
 
     def get_height(self, x, y):
         return self.mountain.evaluate([x, y, 0])[3]
+
 
 classes = [SimpleOperator]
 
