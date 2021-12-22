@@ -1,7 +1,7 @@
 
 import math
 import random
-
+from . import ground
 from . import genGrass
 import bpy
 
@@ -32,28 +32,19 @@ class MainPanel(bpy.types.Panel):
     def draw(self, context):
 
         layout = self.layout
-        layout.scale_x = 4
+        layout.scale_x = 8
         layout.scale_y = 4
 
         row = layout.row()
         row.label(text="Add a biome", icon='WORLD')
 
         col = self.layout.column(align=True)
-        col.prop(context.scene, "range")
-
+        col.prop(context.scene, "size")
+        col.prop(context.scene, "offsetX")
+        col.prop(context.scene, "offsetY")
         row = layout.row()
         # insert operator
-        row.operator("object.text_add", text="Add Desert")
-        # insert operator
-        row.operator("object.text_add", text="Add Forest")
-        row = layout.row()
-        # insert operator
-        row.operator("object.text_add", text="Add Ocean")
-        # insert operator
-        row.operator("object.text_add", text="Add Mountains")
-        row = layout.row()
-        # insert operator
-        row.operator("grass.gen", text="Add Grass")
+        row.operator("gen.landscape", text="Generate")
         # insert operator
         row.operator("delete.all", text="Delete all")
 
@@ -71,74 +62,14 @@ class DeleteAll(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class GenerateGrass(bpy.types.Operator):
-    bl_idname = "grass.gen"
+class GenerateGround(bpy.types.Operator):
+    bl_idname = "gen.landscape"
     bl_label = "Button text"
 
     def execute(self, context):
-
-        grassContainer = bpy.data.objects.new("grassContainer", None)
-        bpy.context.collection.objects.link(grassContainer)
-        flowerContainer = bpy.data.objects.new("flowerContainer", None)
-        bpy.context.collection.objects.link(flowerContainer)
-        bushesContainer = bpy.data.objects.new("bushesContainer", None)
-        bpy.context.collection.objects.link(bushesContainer)
-
-        grassMat: bpy.types.Material = bpy.data.materials.new(
-            name="grassMaterial")
-        grassMat.use_nodes = True
-        grassMat.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
-            0, 0.4, 0.1, 1)
-        bushMat: bpy.types.Material = bpy.data.materials.new(
-            name="bushMaterial")
-        bushMat.use_nodes = True
-        bushMat.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
-            0, 0.3, 0.2, 1)
-        stemMat: bpy.types.Material = bpy.data.materials.new(
-            name="stemMaterial")
-        stemMat.use_nodes = True
-        stemMat.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
-            0.4, 0.1, 0, 1)
-        blossomMat: bpy.types.Material = bpy.data.materials.new(
-            name="blossomMaterial")
-        blossomMat.use_nodes = True
-        blossomMat.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
-            1, 1, 0.6, 1)
-
-        leavesMaterials = [None] * 4
-        grassArray = genGrass.GenerateGrass.createGrassArray(
-            genGrass, grassMat)
-
-        for i in range(len(leavesMaterials)-1):
-            leavesMaterials[i] = bpy.data.materials.new(
-                name="blossomMaterial")
-            leavesMaterials[i].use_nodes = True
-            leavesMaterials[i].node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
-                random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), 1)
-
-        terrainRange: int = int(context.scene.range) / 2
-        terrainBuildFactor: int = int(terrainRange*10)
-        for i in range(terrainBuildFactor):
-            # range from x to y
-            x = random.randrange(round(-terrainRange),
-                                 round(terrainRange))
-            y = random.randrange(round(-terrainRange),
-                                 round(terrainRange))
-            # rand flower creation
-            randFlow = random.randrange(
-                round(terrainBuildFactor/12), round(terrainBuildFactor/6))
-            if(i % randFlow == 0):
-                genGrass.GenerateGrass.genFlowers(
-                    genGrass, x, y, flowerContainer, stemMat, blossomMat, leavesMaterials)
-            # rand bushes creation
-            randBushes = random.randrange(
-                round(terrainBuildFactor/8), round(terrainBuildFactor/4))
-            if(i % randBushes == 0):
-                genGrass.GenerateGrass.genBushes(
-                    genGrass, x, y, bushesContainer, bushMat)
-            # rand grass creation
-            genGrass.GenerateGrass.genGrass(
-                genGrass, x, y, grassArray, grassContainer)
+        ground.Ground.initializeVariable(ground.Ground,
+                                         int(context.scene.size), int(context.scene.offsetX), int(context.scene.offsetY))
+        ground.Ground.generate_ground(ground.Ground, context)
         return {'FINISHED'}
 
 
@@ -161,23 +92,36 @@ def main(context):
         print(ob)
 
 
-classes = [MainPanel, SimpleOperator, GenerateGrass, DeleteAll]
+classes = [MainPanel, SimpleOperator,
+           GenerateGround, DeleteAll]
 
 
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-    bpy.types.Scene.range = bpy.props.StringProperty(
-        name="Quadratmeters",
+    bpy.types.Scene.size = bpy.props.StringProperty(
+        name="Ground Size",
         description="My description",
-        default="40"
+        default="80"
+    )
+    bpy.types.Scene.offsetX = bpy.props.StringProperty(
+        name="Biom offset X",
+        description="My description",
+        default="10"
+    )
+    bpy.types.Scene.offsetY = bpy.props.StringProperty(
+        name="Biom offset Y",
+        description="My description",
+        default="10"
     )
 
 
 def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
-    del bpy.types.Scene.range
+    del bpy.types.Scene.size
+    del bpy.types.Scene.offsetX
+    del bpy.types.Scene.offsetY
 
 
 if __name__ == "__main__":

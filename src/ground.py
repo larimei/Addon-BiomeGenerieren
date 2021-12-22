@@ -2,41 +2,38 @@
 import bpy
 import bmesh
 import random
-# bpy.ops.object.select_all(action='SELECT')
-# bpy.ops.object.delete(use_global=False, confirm=False)
-# bpy.ops.outliner.orphans_purge()
 
 
-class SimpleOperator(bpy.types.Operator):
-    """Tooltip"""
-    bl_idname = "object.simple_operator"
-    bl_label = "Simple Object Operator"
+# class SimpleOperator(bpy.types.Operator):
+#   """Tooltip"""
+#  bl_idname = "object.simple_operator"
+# bl_label = "Simple Object Operator"
+#
+#   @classmethod
+#  def poll(cls, context):
+#     return True
+#
+#   def execute(self, context):
+#      ground = Ground()
+#     ground.generate_ground(context)
+#
+#       return {'FINISHED'}
 
-    @classmethod
-    def poll(cls, context):
-        return True
 
-    def execute(self, context):
-        ground = Ground()
-        ground.generate_ground(context)
-
-        return {'FINISHED'}
-
-
-class Ground:
+class Ground():
     # these should be initialized with input
 
     # int
-    ground_size = 80
-    biome_offset_x = 10
-    biome_offset_y = 10
+    ground_size: int  # 80
+    biome_offset_x: int  # 10
+    biome_offset_y: int  # 10
     # float
     face_edge_size = 0.5
     biome_scale = 20
 
     # constants that are effected by input
-    SUBDIVISION_LEVELS = ground_size / face_edge_size - 1
-    VERTCOUNT_EDGE = round(SUBDIVISION_LEVELS + 2)
+    SUBDIVISION_LEVELS: float
+    VERTCOUNT_EDGE: int
     BIOME_AMOUNT = 4
     # others
     faces = []
@@ -44,6 +41,13 @@ class Ground:
     forest_faces = []
     desert_faces = []
     mountain_faces = []
+
+    def initializeVariable(self, _groundSize, _biome_offset_y, _biome_offset_x):
+        self.ground_size = _groundSize
+        self.biome_offset_x = _biome_offset_x
+        self.biome_offset_y = _biome_offset_y
+        self.SUBDIVISION_LEVELS = self.ground_size / self.face_edge_size - 1
+        self.VERTCOUNT_EDGE = round(self.SUBDIVISION_LEVELS + 2)
 
     def generate_ground(self, context):
         bpy.ops.mesh.primitive_plane_add(
@@ -96,7 +100,7 @@ class Ground:
 
         ground_mesh.to_mesh(ground.data)
         ground_mesh.free()
-        self.allocate_biomes()
+        self.allocate_biomes(Ground)
 
     def allocate_biomes(self):
         for face in self.faces:
@@ -195,21 +199,21 @@ class MountainNoise:
         return self.mountain.evaluate([x, y, 0])[3]
 
 
-classes = [SimpleOperator]
+#classes = [SimpleOperator]
 
 
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
+# def register():
+ #   for cls in classes:
+  #      bpy.utils.register_class(cls)
 
 
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)
+# def unregister():
+ #   for cls in classes:
+  #      bpy.utils.unregister_class(cls)
 
 
-if __name__ == "__main__":
-    register()
+# if __name__ == "__main__":
+ #   register()
 
     # test call
-    bpy.ops.object.simple_operator()
+  #  bpy.ops.object.simple_operator()
