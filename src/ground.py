@@ -43,6 +43,10 @@ class Ground():
     mountain_faces = []
 
     def initializeVariable(self, _groundSize, _biome_offset_y, _biome_offset_x):
+        self.grass_faces = []
+        self.forest_faces = []
+        self.desert_faces = []
+        self.mountain_faces = []
         self.ground_size = _groundSize
         self.biome_offset_x = _biome_offset_x
         self.biome_offset_y = _biome_offset_y
