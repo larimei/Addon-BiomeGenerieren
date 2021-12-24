@@ -95,7 +95,7 @@ class Ground():
                     face.biomes.append(biome)
                 else:
                     new_face: BiomeFace = BiomeFace(index=current_face.index, biomes=[
-                        biome], center=current_face.calc_center_median, normal=current_face.normal)
+                        biome], center=current_face.calc_center_median(), normal=current_face.normal)
                     self.faces.append(new_face)
 
         ground_mesh.to_mesh(ground.data)
