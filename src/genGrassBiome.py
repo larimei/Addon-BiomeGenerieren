@@ -18,12 +18,56 @@ ROT_TIP_MAX = 90
 ROT_FALLOFF = 5
 
 INCREMENTRNDBUSHES: int = 0
-INCREMENTFLOWERS: int = 0
-INCREMENTBUSHES: int = 0
+
+GRASSCONTAINER: bpy.types.Object
+FLOWERSCONTAINER: bpy.types.Object
+BUSHESCONTAINER: bpy.types.Object
+
+GRASSMATERIAL: bpy.types.Material
+BUSHMATERIAL: bpy.types.Material
+STEMMATERIAL: bpy.types.Material
+BLOSSOMMATERIAL: bpy.types.Material
+LEAVESMATERIALS = [None] * 4
 
 
-class GenerateGrass ():
-    def createGrassArray(self, grassMaterial):
+class GenerateGrassBiome ():
+    def createMaterials(self):
+        self.GRASSCONTAINER = bpy.data.objects.new("grassContainer", None)
+        bpy.context.collection.objects.link(self.GRASSCONTAINER)
+        self.FLOWERSCONTAINER = bpy.data.objects.new("flowerContainer", None)
+        bpy.context.collection.objects.link(self.FLOWERSCONTAINER)
+        self.BUSHESCONTAINER = bpy.data.objects.new("bushesContainer", None)
+        bpy.context.collection.objects.link(self.BUSHESCONTAINER)
+
+        self.GRASSMATERIAL = bpy.data.materials.new(
+            name="grassMaterial")
+        self.GRASSMATERIAL.use_nodes = True
+        self.GRASSMATERIAL.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
+            0, 0.4, 0.1, 1)
+        self.BUSHMATERIAL = bpy.data.materials.new(
+            name="bushMaterial")
+        self.BUSHMATERIAL.use_nodes = True
+        self.BUSHMATERIAL.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
+            0, 0.3, 0.2, 1)
+        self.STEMMATERIAL = bpy.data.materials.new(
+            name="stemMaterial")
+        self.STEMMATERIAL.use_nodes = True
+        self.STEMMATERIAL.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
+            0.4, 0.1, 0, 1)
+        self.BLOSSOMMATERIAL = bpy.data.materials.new(
+            name="blossomMaterial")
+        self.BLOSSOMMATERIAL.use_nodes = True
+        self.BLOSSOMMATERIAL.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
+            1, 1, 0.6, 1)
+
+        for i in range(len(self.LEAVESMATERIALS)-1):
+            self.LEAVESMATERIALS[i] = bpy.data.materials.new(
+                name="blossomMaterial")
+            self.LEAVESMATERIALS[i].use_nodes = True
+            self.LEAVESMATERIALS[i].node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
+                random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), 1)
+
+    def createGrassArray(self):
         grassArray = [bpy.data.objects] * 10
         for grassIncrement in range(len(grassArray)):
             grass_mesh = bpy.data.meshes.new("grass_shrub_mesh")
@@ -97,27 +141,30 @@ class GenerateGrass ():
             # BMesh auf Mesh anwenden und abschließen
             bm.to_mesh(grass_mesh)
             bm.free()
-            grass_object.data.materials.append(grassMaterial)
+            grass_object.data.materials.append(self.GRASSMATERIAL)
             grassArray[grassIncrement] = grass_object
         self.INCREMENTGRASS = 0
         return grassArray
 
-    def genGrass(self, grassArray, grassContainer, grass_face):
-        for i in range(8):
+    def genGrass(self, grassArray, grass_face):
+        rndCycle: int = random.randint(9, 36)
+        for i in range(rndCycle):
             randGrass: int = random.randint(0, len(grassArray)-1)
             grassObjectCopy = bpy.data.objects.new(
                 "grass" + str(self.INCREMENTGRASS), grassArray[randGrass].data)
             bpy.context.collection.objects.link(grassObjectCopy)
             grassObjectCopy.scale = (0.025, 0.025, 0.025)
-            rndAroundCenter = mathutils.Vector((random.uniform(grass_face.center.x, grass_face.center.x + 1), random.uniform(
-                grass_face.center.y, grass_face.center.y + 1), grass_face.center.z))
+            rndOffsetNeg = random.uniform(-1, 0)
+            rndOffsetPos = random.uniform(0, 1)
+            rndAroundCenter = mathutils.Vector((random.uniform(grass_face.center.x + rndOffsetPos, grass_face.center.x + rndOffsetNeg), random.uniform(
+                grass_face.center.y + rndOffsetPos, grass_face.center.y + rndOffsetNeg), grass_face.center.z))
             grassObjectCopy.location = (
                 rndAroundCenter.x, rndAroundCenter.y, rndAroundCenter.z + 1)
 
             grassObjectCopy.rotation_euler = (0, 0, random.randrange(0, 360))
-            grassObjectCopy.parent = grassContainer
+            grassObjectCopy.parent = self.GRASSCONTAINER
 
-    def genFlowers(self, flowerContainer, stemMaterial, blossomMaterial, leavesMaterials, grass_faces):
+    def genFlowers(self, grass_face):
         bpy.ops.mesh.primitive_cube_add(
             location=(0, 0, 6), scale=(0.5, 0.5, 0.15))
 
@@ -145,8 +192,7 @@ class GenerateGrass ():
         paddelsContainer = bpy.data.objects.new("paddelsContainer", None)
         bpy.context.collection.objects.link(paddelsContainer)
         flowerParent = bpy.data.objects.new("flowerParent", None)
-        flowerParent.location = (grass_faces[self.INCREMENTFLOWERS].center.x,
-                                 grass_faces[self.INCREMENTFLOWERS].center.y, grass_faces[self.INCREMENTFLOWERS].center.z + 6)
+
         rndScale = random.uniform(0.5, 1.25)
         flowerParent.scale = (rndScale, rndScale, rndScale)
         bpy.context.collection.objects.link(flowerParent)
@@ -163,31 +209,34 @@ class GenerateGrass ():
             paddel.rotation_euler.z = angle
             paddel.parent = paddelsContainer
 
-        paddel.data.materials.append(leavesMaterials[rnd])
+        paddel.data.materials.append(self.LEAVESMATERIALS[rnd])
         bpy.data.objects.remove(paddelRoot)
         paddelsContainer.parent = flowerParent
         bpy.ops.mesh.primitive_ico_sphere_add(
             location=(0, 0, 6), scale=(1.75, 1.75, 0.5))
 
-        bpy.context.active_object.data.materials.append(blossomMaterial)
+        bpy.context.active_object.data.materials.append(self.BLOSSOMMATERIAL)
         bpy.context.active_object.name = "blossom"
         bpy.context.active_object.parent = flowerParent
         bpy.ops.mesh.primitive_cube_add(
             location=(0, 0, 2), scale=(0.75, 0.75, 4))
-        bpy.context.active_object.data.materials.append(stemMaterial)
+        bpy.context.active_object.data.materials.append(self.STEMMATERIAL)
         bpy.context.active_object.name = "steam"
         bpy.context.active_object.parent = flowerParent
-        flowerParent.parent = flowerContainer
-        self.INCREMENTFLOWERS += 1
+        rndScale = random.uniform(0.025, 0.04)
+        flowerParent.scale = (rndScale, rndScale, rndScale)
+        flowerParent.location = (grass_face.center.x,
+                                 grass_face.center.y, grass_face.center.z + 1)
+        flowerParent.parent = self.FLOWERSCONTAINER
 
-    def genBushes(self, bushesContainer, bushMaterial, grass_faces):
+    def genBushes(self, grass_face):
 
         bpy.ops.mesh.primitive_ico_sphere_add(
             subdivisions=1, enter_editmode=True, location=(0, 0, 5), scale=(10, 10, 10))
 
         bushData = bpy.context.active_object.data
         bushObject: bpy.types.Object = bpy.context.active_object
-        bushObject.data.materials.append(bushMaterial)
+        bushObject.data.materials.append(self.BUSHMATERIAL)
         bpy.ops.mesh.select_mode(type="VERT")
         bm = bmesh.from_edit_mesh(bushData)
 
@@ -230,9 +279,8 @@ class GenerateGrass ():
             duplicatedBush.scale = (0.45, 0.45, 0.45)
             duplicatedBush.parent = bushObject
         bushObject.rotation_euler = (0, 0, random.randrange(0, 360))
-        bushObject.location = (grass_faces[self.INCREMENTBUSHES].center.x,
-                               grass_faces[self.INCREMENTBUSHES].center.y, grass_faces[self.INCREMENTBUSHES].center.z)
-        rndScale = random.uniform(0.5, 1.25)
+        bushObject.location = (grass_face.center.x,
+                               grass_face.center.y, grass_face.center.z + 1)
+        rndScale = random.uniform(0.045, 0.085)
         bushObject.scale = (rndScale, rndScale, rndScale)
-        bushObject.parent = bushesContainer
-        self.INCREMENTBUSHES += 1
+        bushObject.parent = self.BUSHESCONTAINER

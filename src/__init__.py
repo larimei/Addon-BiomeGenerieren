@@ -2,7 +2,7 @@
 import math
 import random
 from . import ground
-from . import genGrass
+from . import genGrassBiome
 import bpy
 
 
@@ -72,65 +72,44 @@ class GenerateGround(bpy.types.Operator):
                                          int(context.scene.size), int(context.scene.offsetX), int(context.scene.offsetY))
         ground.Ground.generate_ground(ground.Ground, context)
         # ground--------------------------
-        GenerateGrass().execute()
+        GenerateBiomeContent().generateGrassBiome()
         return {'FINISHED'}
 
 
-class GenerateGrass():
+class GenerateBiomeContent():
 
-    def execute(GenerateGrass,):
-
-        grassContainer = bpy.data.objects.new("grassContainer", None)
-        bpy.context.collection.objects.link(grassContainer)
-        flowerContainer = bpy.data.objects.new("flowerContainer", None)
-        bpy.context.collection.objects.link(flowerContainer)
-        bushesContainer = bpy.data.objects.new("bushesContainer", None)
-        bpy.context.collection.objects.link(bushesContainer)
-
-        grassMat: bpy.types.Material = bpy.data.materials.new(
-            name="grassMaterial")
-        grassMat.use_nodes = True
-        grassMat.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
-            0, 0.4, 0.1, 1)
-        bushMat: bpy.types.Material = bpy.data.materials.new(
-            name="bushMaterial")
-        bushMat.use_nodes = True
-        bushMat.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
-            0, 0.3, 0.2, 1)
-        stemMat: bpy.types.Material = bpy.data.materials.new(
-            name="stemMaterial")
-        stemMat.use_nodes = True
-        stemMat.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
-            0.4, 0.1, 0, 1)
-        blossomMat: bpy.types.Material = bpy.data.materials.new(
-            name="blossomMaterial")
-        blossomMat.use_nodes = True
-        blossomMat.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
-            1, 1, 0.6, 1)
-
-        leavesMaterials = [None] * 4
-        grassArray = genGrass.GenerateGrass.createGrassArray(
-            genGrass, grassMat)
-
-        for i in range(len(leavesMaterials)-1):
-            leavesMaterials[i] = bpy.data.materials.new(
-                name="blossomMaterial")
-            leavesMaterials[i].use_nodes = True
-            leavesMaterials[i].node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
-                random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), 1)
-
+    def generateGrassBiome(GenerateGrass):
+        genGrassBiome.GenerateGrassBiome.createMaterials(genGrassBiome)
+        grassArray = genGrassBiome.GenerateGrassBiome.createGrassArray(
+            genGrassBiome)
         for i in range(len(ground.Ground.grass_faces)):
-            rnd = random.randint(5, 25)
-            if i % rnd == 0:
-                genGrass.GenerateGrass.genGrass(
-                    genGrass, grassArray, grassContainer, ground.Ground.grass_faces[i])
+            rndGrass = random.randint(50, 75)
+            if i % rndGrass == 0:
+                genGrassBiome.GenerateGrassBiome.genGrass(
+                    genGrassBiome, grassArray, ground.Ground.grass_faces[i])
+            rndFlowers = random.randint(200, 400)
+            if i % rndFlowers == 0:
+                genGrassBiome.GenerateGrassBiome.genFlowers(
+                    genGrassBiome, ground.Ground.grass_faces[i])
+            rndBushes = random.randint(400, 700)
+            if i % rndBushes == 0:
+                genGrassBiome.GenerateGrassBiome.genBushes(
+                    genGrassBiome, ground.Ground.grass_faces[i])
 
-            # genGrass.GenerateGrass.genFlowers(
-            #    genGrass,  flowerContainer, stemMat, blossomMat, leavesMaterials, ground.Ground.grass_faces)
-            # rand bushes creation
-            # genGrass.GenerateGrass.genBushes(
-            # genGrass, bushesContainer, bushMat, ground.Ground.grass_faces)
-            # rand grass creation
+    def generateForestBiome(GenerateGrass):
+        # generate Forrest content here
+        for i in range(len(ground.Ground.forest_faces)):
+            print(ground.Ground.forest_faces[i])
+
+    def generateDesertBiome(GenerateGrass):
+        # generate Desert content here
+        for i in range(len(ground.Ground.desert_faces)):
+            print(ground.Ground.desert_faces[i])
+
+    def generateMountainBiome(GenerateGrass):
+        # generate Mountain content here
+        for i in range(len(ground.Ground.mountain_faces)):
+            print(ground.Ground.mountain_faces[i])
 
 
 class SimpleOperator(bpy.types.Operator):
