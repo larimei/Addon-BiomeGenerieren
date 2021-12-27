@@ -29,7 +29,7 @@ class Ground():
     biome_offset_y: int  # 10
     # float
     face_edge_size = 0.5
-    biome_scale = 20
+    biome_scale: float
 
     # constants that are effected by input
     SUBDIVISION_LEVELS: float
@@ -42,14 +42,11 @@ class Ground():
     desert_faces = []
     mountain_faces = []
 
-    def initializeVariable(self, _groundSize, _biome_offset_y, _biome_offset_x):
-        self.grass_faces = []
-        self.forest_faces = []
-        self.desert_faces = []
-        self.mountain_faces = []
+    def initializeVariable(self, _groundSize, _biome_offset_y, _biome_offset_x, _biome_scale):
         self.ground_size = _groundSize
         self.biome_offset_x = _biome_offset_x
         self.biome_offset_y = _biome_offset_y
+        self.biome_scale = _biome_scale
         self.SUBDIVISION_LEVELS = self.ground_size / self.face_edge_size - 1
         self.VERTCOUNT_EDGE = round(self.SUBDIVISION_LEVELS + 2)
 

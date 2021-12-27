@@ -116,7 +116,7 @@ class GenerateGrassBiome ():
                                      verts=[vert_1, vert_2])
 
                     # Generierung des Polygons in erster Stufe überspringen (weil bisher nur 2 Verices bestehen)
-                    if i is not 0:
+                    if i != 0:
                         bm.faces.new(
                             (last_vert_1, last_vert_2, vert_2, vert_1))
 

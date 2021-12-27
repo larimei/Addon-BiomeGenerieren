@@ -42,6 +42,7 @@ class MainPanel(bpy.types.Panel):
         col.prop(context.scene, "size")
         col.prop(context.scene, "offsetX")
         col.prop(context.scene, "offsetY")
+        col.prop(context.scene, "biomeScale")
         row = layout.row()
         # insert operator
         row.operator("gen.landscape", text="Generate")
@@ -69,7 +70,7 @@ class GenerateGround(bpy.types.Operator):
     def execute(self, context):
         # ground--------------------------
         ground.Ground.initializeVariable(ground.Ground,
-                                         int(context.scene.size), int(context.scene.offsetX), int(context.scene.offsetY))
+                                         int(context.scene.size), int(context.scene.offsetX), int(context.scene.offsetY), float(context.scene.biomeScale))
         ground.Ground.generate_ground(ground.Ground, context)
         # ground--------------------------
         GenerateBiomeContent().generateGrassBiome()
@@ -138,20 +139,25 @@ classes = [MainPanel, SimpleOperator,
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-    bpy.types.Scene.size = bpy.props.StringProperty(
-        name="Ground Size",
+    bpy.types.Scene.size = bpy.props.IntProperty(
+        name="Ground Mesh Size",
         description="My description",
-        default="80"
+        default=80
     )
-    bpy.types.Scene.offsetX = bpy.props.StringProperty(
+    bpy.types.Scene.offsetX = bpy.props.IntProperty(
         name="Biom offset X",
         description="My description",
-        default="10"
+        default=10
     )
-    bpy.types.Scene.offsetY = bpy.props.StringProperty(
+    bpy.types.Scene.offsetY = bpy.props.IntProperty(
         name="Biom offset Y",
         description="My description",
-        default="10"
+        default=10
+    )
+    bpy.types.Scene.biomeScale = bpy.props.FloatProperty(
+        name="Biome Scale",
+        description="My description",
+        default=20.0
     )
 
 
@@ -161,6 +167,7 @@ def unregister():
     del bpy.types.Scene.size
     del bpy.types.Scene.offsetX
     del bpy.types.Scene.offsetY
+    del bpy.types.Scene.biomeScale
 
 
 if __name__ == "__main__":
