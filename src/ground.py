@@ -1,7 +1,7 @@
 
 import bpy
 import bmesh
-import random
+import math
 
 
 # class SimpleOperator(bpy.types.Operator):
@@ -64,29 +64,37 @@ class Ground():
         ground_mesh.verts.ensure_lookup_table()
 
         v = VoronoiNoise(scale=self.biome_scale)
-        hn = GlobalNoise(scale=2)
-        mn = MountainNoise(scale=0.4, distortion=1.2)
+        hn = GlobalNoise(scale=6)
+        mn = MountainNoise(scale=0.4, distortion=0.3)
+        dn = DesertNoise(scale=4, turbulence=200)
+        pn = PlainNoise(scale=10, depth=0)
         for i in range(len(ground_mesh.verts)):
             vert = ground_mesh.verts[i].co
-            info = v.get_biome_and_weight(
+            biome, weight = v.get_biome_and_weight(
                 vert.x + self.biome_offset_x, vert.y + self.biome_offset_y)
-            biome = info[0]
-            weight = info[1]
+
             global_height = hn.get_height(vert.x, vert.y)
             # grass
             if biome == 0:
-                vert.z = 2 * global_height + 3 * weight * global_height
+                vert.z = pn.get_height(vert.x, vert.y) * \
+                    3 + global_height - 1
+
             # forest
             elif biome == 1:
-                vert.z = 2 * global_height + 3 * weight * global_height
+                vert.z = global_height
+
             # desert
             elif biome == 2:
-                vert.z = 2 * global_height + 3 * weight * global_height
+                canyon_height = dn.get_height(vert.x, vert.y)
+                vert.z = math.pow(canyon_height, 2) * 3 + \
+                    0.5 * global_height - 0.5
             # mountains
             else:
                 mtn_height = mn.get_height(vert.x, vert.y)
-                #vert.z = 2 * global_height + 3 * weight * mtn_height
-                vert.z = weight * weight
+                vert.z = global_height + \
+                    math.pow(weight, 3) + math.pow(weight, 2) * mtn_height
+
+            # save face reference in arrays
             linked_faces = ground_mesh.verts[i].link_faces
             for j in range(len(linked_faces)):
                 current_face = linked_faces[j]
@@ -103,6 +111,13 @@ class Ground():
         ground_mesh.free()
         self.allocate_biomes(Ground)
 
+        # Add Decimate Modifier for Tris:
+        bpy.ops.object.select_pattern(
+            pattern="Ground", case_sensitive=True, extend=False)
+        bpy.ops.object.modifier_add(type='DECIMATE')
+        bpy.context.object.modifiers["Decimate"].use_collapse_triangulate = True
+        bpy.context.object.modifiers["Decimate"].ratio = 0.95
+
     def allocate_biomes(self):
         for face in self.faces:
             for biome in face.biomes:
@@ -114,12 +129,6 @@ class Ground():
                     self.desert_faces.append(face)
                 if biome == 3:
                     self.mountain_faces.append(face)
-
-
-class Biome:
-    def __init__(self, type):
-        self.type = type
-        # self.material
 
 
 class BiomeFace:
@@ -134,7 +143,7 @@ class VoronoiNoise:
 
     def __init__(self, scale: float):
         bpy.ops.texture.new()
-        tex_clr = bpy.data.textures["Texture"]
+        tex_clr = TextureUtils.getTextureIfExists("Voronoi")
         tex_clr.name = "Voronoi"
         tex_clr.type = 'VORONOI'
         self.voronoi_clr: bpy.types.VoronoiTexture = bpy.data.textures["Voronoi"]
@@ -143,7 +152,7 @@ class VoronoiNoise:
         self.voronoi_clr.noise_scale = scale
 
         bpy.ops.texture.new()
-        tex_weight = bpy.data.textures["Texture"]
+        tex_weight = TextureUtils.getTextureIfExists("Weight")
         tex_weight.name = "Weight"
         tex_weight.type = 'VORONOI'
         self.voronoi_weight: bpy.types.VoronoiTexture = bpy.data.textures["Weight"]
@@ -172,23 +181,23 @@ class GlobalNoise:
 
     def __init__(self, scale: float):
         bpy.ops.texture.new()
-        tex_clr = bpy.data.textures["Texture"]
-        tex_clr.name = "Cloud"
+        tex_clr = TextureUtils.getTextureIfExists("GlobalNoise")
+        tex_clr.name = "GlobalNoise"
         tex_clr.type = 'CLOUDS'
-        self.cloud: bpy.types.CloudsTexture = bpy.data.textures["Cloud"]
+        self.cloud: bpy.types.CloudsTexture = bpy.data.textures["GlobalNoise"]
         self.cloud.noise_basis = 'BLENDER_ORIGINAL'
         self.cloud.cloud_type = 'GRAYSCALE'
         self.cloud.noise_scale = scale
 
     def get_height(self, x, y):
-        return self.cloud.evaluate([x, y, 0])[3]
+        return self.cloud.evaluate([x, y, 0])[3] * 3
 
 
 class MountainNoise:
 
     def __init__(self, scale: float, distortion: float):
         bpy.ops.texture.new()
-        tex_clr = bpy.data.textures["Texture"]
+        tex_clr = TextureUtils.getTextureIfExists("Mountain")
         tex_clr.name = "Mountain"
         tex_clr.type = 'DISTORTED_NOISE'
         self.mountain: bpy.types.DistortedNoiseTexture = bpy.data.textures["Mountain"]
@@ -198,6 +207,49 @@ class MountainNoise:
 
     def get_height(self, x, y):
         return self.mountain.evaluate([x, y, 0])[3]
+
+
+class DesertNoise:
+
+    def __init__(self, scale: float, turbulence: float):
+        bpy.ops.texture.new()
+        tex_clr = TextureUtils.getTextureIfExists("Desert")
+        tex_clr.name = "Desert"
+        tex_clr.type = 'STUCCI'
+        self.desert: bpy.types.StucciTexture = bpy.data.textures["Desert"]
+        self.desert.stucci_type = 'PLASTIC'
+        self.desert.noise_scale = scale
+        self.desert.turbulence = turbulence
+
+    def get_height(self, x, y):
+        return self.desert.evaluate([x, y, 0])[3]
+
+
+class PlainNoise:
+
+    def __init__(self, scale: float, depth: float):
+        bpy.ops.texture.new()
+        tex_clr = TextureUtils.getTextureIfExists("Plain")
+        tex_clr.name = "Plain"
+        tex_clr.type = 'CLOUDS'
+        self.plain: bpy.types.StucciTexture = bpy.data.textures["Plain"]
+        self.plain.noise_basis = 'ORIGINAL_PERLIN'
+        self.plain.noise_type = 'SOFT_NOISE'
+        self.plain.noise_scale = scale
+        self.plain.noise_depth = depth
+
+    def get_height(self, x, y):
+        return self.plain.evaluate([x, y, 0])[3]
+
+
+class TextureUtils:
+    def getTextureIfExists(name: str):
+        try:
+            tex = bpy.data.textures[name]
+            bpy.data.textures.remove(bpy.data.textures["Texture"])
+        except KeyError:
+            tex = bpy.data.textures["Texture"]
+        return tex
 
 
 #classes = [SimpleOperator]
