@@ -1,3 +1,4 @@
+import typing
 import bpy
 import random
 import bmesh
@@ -41,7 +42,7 @@ def generateTree():
         posX = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT)
         vert = (posX, posY, posZ)
         verts.append(vert)
-        if i is not 0:
+        if i != 0:
             edge = (i-1, i)
             edges.append(edge)
 
@@ -84,7 +85,7 @@ def generateTree():
 
     for v in me.skin_vertices[0].data:
         v.radius = rad_x, rad_y
-        if i is 0:
+        if i == 0:
             rad_x = random.uniform(0.65, 0.85)
             rad_y = random.uniform(0.65, 0.85)
         else:

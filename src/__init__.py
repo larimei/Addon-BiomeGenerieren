@@ -3,6 +3,7 @@ import math
 import random
 from . import ground
 from . import genGrassBiome
+from . import generateTree
 import bpy
 
 
@@ -73,7 +74,8 @@ class GenerateGround(bpy.types.Operator):
                                          int(context.scene.size), int(context.scene.offsetX), int(context.scene.offsetY), float(context.scene.biomeScale))
         ground.Ground.generate_ground(ground.Ground, context)
         # ground--------------------------
-        GenerateBiomeContent().generateGrassBiome()
+        #GenerateBiomeContent().generateGrassBiome()
+        #GenerateBiomeContent().generateForestBiome()
         return {'FINISHED'}
 
 
@@ -97,10 +99,11 @@ class GenerateBiomeContent():
                 genGrassBiome.GenerateGrassBiome.genBushes(
                     genGrassBiome, ground.Ground.grass_faces[i])
 
-    def generateForestBiome(GenerateGrass):
-        # generate Forrest content here
+    def generateForestBiome(GenerateForest):
         for i in range(len(ground.Ground.forest_faces)):
-            print(ground.Ground.forest_faces[i])
+            rndTree = random.randint(250, 275)
+            if i % rndTree == 0:
+                generateTree.Tree.generateTree(ground.Ground.forest_faces[i])
 
     def generateDesertBiome(GenerateGrass):
         # generate Desert content here
