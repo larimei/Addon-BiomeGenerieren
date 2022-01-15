@@ -3,6 +3,8 @@ import bpy
 import bmesh
 import math
 
+from src import generateTree
+
 
 # class SimpleOperator(bpy.types.Operator):
 #   """Tooltip"""
@@ -41,6 +43,11 @@ class Ground():
     forest_faces = []
     desert_faces = []
     mountain_faces = []
+
+    forest_indexes = []
+    grass_indexes = []
+    desert_indexes = []
+    mountain_indexes = []
 
     def initializeVariable(self, _groundSize, _biome_offset_y, _biome_offset_x, _biome_scale):
         self.ground_size = _groundSize
@@ -110,6 +117,14 @@ class Ground():
         ground_mesh.to_mesh(ground.data)
         ground_mesh.free()
         self.allocate_biomes(Ground)
+        self.makeVertexGroup(ground, "forest", self.forest_indexes, generateTree.createMaterial(
+            "forest", (0.038, 0.7, 0.05, 1.000000)))
+        self.makeVertexGroup(ground, "grass", self.grass_indexes, generateTree.createMaterial(
+            "grass", (0.09, 0.9, 0.1, 1.000000)))
+        self.makeVertexGroup(ground,"desert", self.desert_indexes, generateTree.createMaterial(
+            "desert", (0.77, 0.65, 0.39, 1.000000)))
+        self.makeVertexGroup(ground, "mountain", self.mountain_indexes, generateTree.createMaterial(
+            "mountain", (0.4, 0.4, 0.4, 1.000000)))
 
         # Add Decimate Modifier for Tris:
         bpy.ops.object.select_pattern(
@@ -118,17 +133,35 @@ class Ground():
         bpy.context.object.modifiers["Decimate"].use_collapse_triangulate = True
         bpy.context.object.modifiers["Decimate"].ratio = 0.95
 
+    def makeVertexGroup(object, nameGroup, indexes, material):
+        group = object.vertex_groups.new(name=nameGroup)
+        group.add(indexes, 1.0, 'ADD')
+        print(group)
+        bpy.ops.object.vertex_group_set_active(group=nameGroup)
+        bpy.ops.object.material_slot_add()
+        object.material_slots[object.material_slots.__len__(
+        ) - 1].material = material 
+        bpy.ops.object.editmode_toggle()  # Go in edit mode
+        bpy.ops.mesh.select_all(action='DESELECT')  # Deselect all the vertices
+        bpy.ops.object.vertex_group_select()  # Select the vertices of the vertex group
+        bpy.ops.object.material_slot_assign()         # QAssign the material on the selected vertices
+        bpy.ops.object.editmode_toggle()  # Return in object mode
+
     def allocate_biomes(self):
         for face in self.faces:
             for biome in face.biomes:
                 if biome == 0:
                     self.grass_faces.append(face)
+                    self.grass_indexes.append(face.index)
                 if biome == 1:
                     self.forest_faces.append(face)
+                    self.forest_indexes.append(face.index)
                 if biome == 2:
                     self.desert_faces.append(face)
+                    self.desert_indexes.append(face.index)
                 if biome == 3:
                     self.mountain_faces.append(face)
+                    self.mountain_indexes.append(face.index)
 
 
 class BiomeFace:
