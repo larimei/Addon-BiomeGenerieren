@@ -9,27 +9,24 @@ MIN_SHIFT = 0.5
 MAX_SHIFT = 1.5
 HEIGHT = 1.5
 
-leavePositions = []
 
 def generateBranches(edges, verts, vert, branch, lastIndex):
-    for i in range(random.randrange(3, 5)):
+    for i in range(random.randrange(3, 6)):
         if branch:
-            branchvert = (vert[0] + random.uniform(0.2, 0.75), vert[1] +
-                          random.uniform(0.2, 0.75), vert[2] - random.uniform(0.1, 0.75))
+            branchvert = (vert[0] + random.uniform(0.5, 1.25), vert[1] +
+                          random.uniform(0.5, 1.25), vert[2] + random.uniform(0.5, 1.25)) #plus statt minus dass es nach oben geht
         elif branch is False:
-            branchvert = (vert[0] + random.uniform(-0.75, -0.2), vert[1] +
-                          random.uniform(-0.75, -0.2), vert[2] - random.uniform(0.2, 0.75))
+            branchvert = (vert[0] + random.uniform(-1.5, -0.25), vert[1] +
+                          random.uniform(-1.5, -0.25), vert[2] + random.uniform(0.25, 1.5)) #plus statt minus dass es nach oben geht
 
         vert = branchvert
         verts.append(branchvert)
         if i is 0:
-            edge = (lastIndex - (VERTICES/2), len(verts) - 1)
+            edge = (lastIndex, len(verts) - 1)
         else:
-            edge = (len(verts) - 2, len(verts) - 1) 
+            edge = (len(verts) - 2, len(verts)-1) 
 
         edges.append(edge)
-
-    leavePositions.append(branchvert)
 
 def generateCactus():
 
@@ -42,6 +39,7 @@ def generateCactus():
     verts = []
     edges = []
 
+    bool = False
     for i in range(VERTICES):
         posZ = i * HEIGHT
         posY = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT)
@@ -49,11 +47,20 @@ def generateCactus():
         vert = (posX, posY, posZ)
         verts.append(vert)
         if i is not 0:
-            edge = (i-1, i)
+            if bool:
+                edge = (lastIndex, len(verts) -1)   #ab hier geändert, dass man auch mitten drin zweige einfügen kann (sonst werden die Vertices immer an das letzte gehängt)
+                bool = False
+            else:
+                edge = (len(verts) - 2, len(verts) -1)
             edges.append(edge)
-
-    generateBranches(edges, verts, vert, True, (VERTICES/2))
-    generateBranches(edges, verts, vert, False, (VERTICES/2))
+        if i is 2:   #aussuchen, an welchen Vertex der Zweig haben soll
+             lastIndex= len(verts) - 1
+             generateBranches(edges, verts, vert, True, lastIndex)
+             bool = True
+        elif i is 4: #hier auch nochmal (wichtig sind die bool werte zu setzen, sonst wird oben der falsche index für die edge verwendet)
+            lastIndex = len(verts) - 1
+            generateBranches(edges, verts, vert, False, lastIndex)            
+            bool = True
 
     faces = []
 
@@ -63,14 +70,14 @@ def generateCactus():
 
     obj.select_set(True)
 
-  # bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.object.mode_set(mode='EDIT')
 
-  # bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.mode_set(mode='OBJECT')
 
     skin: bpy.types.SkinModifier = bpy.ops.object.modifier_add(type='SKIN')
 
-    rad_x = random.uniform(0.65, 0.75)
-    rad_y = random.uniform(0.65, 0.75)
+    rad_x = random.uniform(0.75, 1.75)
+    rad_y = random.uniform(0.75, 1.75)
 
     i = 0
 
@@ -92,9 +99,7 @@ def generateCactus():
 
 
     bpy.ops.object.select_all(action='SELECT')
-    bpy.ops.object.join()
-
-
+ #   bpy.ops.object.join()
 
 
 class CactusBranches(bpy.types.Operator):
