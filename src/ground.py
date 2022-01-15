@@ -4,6 +4,7 @@ import bmesh
 import math
 
 from src import generateTree
+from utils import TextureUtils
 
 
 # class SimpleOperator(bpy.types.Operator):
@@ -121,7 +122,7 @@ class Ground():
             "forest", (0.038, 0.7, 0.05, 1.000000)))
         self.makeVertexGroup(ground, "grass", self.grass_indexes, generateTree.createMaterial(
             "grass", (0.09, 0.9, 0.1, 1.000000)))
-        self.makeVertexGroup(ground,"desert", self.desert_indexes, generateTree.createMaterial(
+        self.makeVertexGroup(ground, "desert", self.desert_indexes, generateTree.createMaterial(
             "desert", (0.77, 0.65, 0.39, 1.000000)))
         self.makeVertexGroup(ground, "mountain", self.mountain_indexes, generateTree.createMaterial(
             "mountain", (0.4, 0.4, 0.4, 1.000000)))
@@ -140,11 +141,12 @@ class Ground():
         bpy.ops.object.vertex_group_set_active(group=nameGroup)
         bpy.ops.object.material_slot_add()
         object.material_slots[object.material_slots.__len__(
-        ) - 1].material = material 
+        ) - 1].material = material
         bpy.ops.object.editmode_toggle()  # Go in edit mode
         bpy.ops.mesh.select_all(action='DESELECT')  # Deselect all the vertices
         bpy.ops.object.vertex_group_select()  # Select the vertices of the vertex group
-        bpy.ops.object.material_slot_assign()         # QAssign the material on the selected vertices
+        # QAssign the material on the selected vertices
+        bpy.ops.object.material_slot_assign()
         bpy.ops.object.editmode_toggle()  # Return in object mode
 
     def allocate_biomes(self):
@@ -273,16 +275,6 @@ class PlainNoise:
 
     def get_height(self, x, y):
         return self.plain.evaluate([x, y, 0])[3]
-
-
-class TextureUtils:
-    def getTextureIfExists(name: str):
-        try:
-            tex = bpy.data.textures[name]
-            bpy.data.textures.remove(bpy.data.textures["Texture"])
-        except KeyError:
-            tex = bpy.data.textures["Texture"]
-        return tex
 
 
 #classes = [SimpleOperator]

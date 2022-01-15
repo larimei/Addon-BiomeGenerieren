@@ -5,6 +5,7 @@ import random
 import bmesh
 import mathutils
 import math
+from utils import MaterialUtils
 
 LEAVEMATERIAL: bpy.types.Material
 TRUNKMATERIAL: bpy.types.Material
@@ -20,19 +21,6 @@ MAX_SHIFT = 1.1
 
 AMOUNT = 5
 HEIGHT = AMOUNT / 2.2
-
-
-
-
-def createMaterial(name, value):
-
-
-    material = bpy.data.materials.new(
-        name=name)
-    material.use_nodes = True
-    material.node_tree.nodes["Principled BSDF"].inputs[0].default_value = value
-
-    return material
 
 
 class Tree():
@@ -115,11 +103,13 @@ class Tree():
 
         bpy.ops.object.modifier_add(type='SUBSURF')
         bpy.context.object.modifiers["Subdivision"].render_levels = 1
-        bpy.context.object.data.materials.append(createMaterial("trunkMaterial", (0.038, 0.7, 0.05, 1.000000)))
+        bpy.context.object.data.materials.append(
+            MaterialUtils.createMaterial("trunkMaterial", (0.038, 0.7, 0.05, 1.000000)))
 
         leaves = bpy.ops.mesh.primitive_ico_sphere_add(radius=random.uniform(1, 1.2), enter_editmode=False, align='WORLD', location=(
             posX, posY, posZ), scale=(random.uniform(2.5, 5), random.uniform(2.5, 5), random.uniform(6, 8)))
-        bpy.context.object.data.materials.append(createMaterial("leaveMaterial", (0.3, 0.152, 0.02, 1.000000)))
+        bpy.context.object.data.materials.append(
+            MaterialUtils.createMaterial("leaveMaterial", (0.3, 0.152, 0.02, 1.000000)))
 
     def generateCylinder(location, scale, width_scale_top, width_scale_bottom, trunk):
         mesh = bpy.ops.mesh.primitive_cylinder_add(
@@ -137,19 +127,19 @@ class Tree():
             col = bpy.data.collections.get("Collection")
         # Get the active mesh
         mesh = bpy.context.object
-    
+
         # Get a BMesh representation
         bm = bmesh.new()   # create an empty BMesh
         bm.from_mesh(mesh.data)   # fill it in from a Mesh
-    
+
         bpy.context.view_layer.objects.active = mesh
-    
+
         bpy.ops.object.editmode_toggle()
-    
+
         bm = bmesh.from_edit_mesh(mesh.data)
-    
+
         bm.faces.ensure_lookup_table()
-    
+
         for i in range(0, 8):
             face: BMFaceSeq = bm.faces[i]
             if i is 4:
@@ -158,14 +148,14 @@ class Tree():
                 scale = width_scale_bottom
             else:
                 scale = random.uniform(0.9, 1.1)
-    
+
             if isinstance(face, bmesh.types.BMFace):
                 c = face.calc_center_median()
                 for v in face.verts:
                     v.co = c + scale * (v.co - c)
-    
+
         bmesh.update_edit_mesh(mesh.data)
-    
+
         bpy.ops.object.editmode_toggle()
 
     def generatePineTree(location):
@@ -174,17 +164,18 @@ class Tree():
 
         for i in range(0, AMOUNT + 1):
             if i is 0:
-                Tree.generateCylinder((location.center.x,location.center.y,location.center.z), (1,1,0.75), 0.6, 1, True)
-                bpy.context.object.data.materials.append(createMaterial("pineTrunkMaterial", (0.051, 0.010, 0.00, 1.000000))) 
+                Tree.generateCylinder(
+                    (location.center.x, location.center.y, location.center.z), (1, 1, 0.75), 0.6, 1, True)
+                bpy.context.object.data.materials.append(MaterialUtils.createMaterial(
+                    "pineTrunkMaterial", (0.051, 0.010, 0.00, 1.000000)))
             else:
                 if i is AMOUNT:
-                    Tree.generateCylinder((location.center.x,location.center.y,location.center.z + HEIGHT * i / AMOUNT), (1,1,0.8), 0.07, bottom, False)
+                    Tree.generateCylinder((location.center.x, location.center.y, location.center.z +
+                                          HEIGHT * i / AMOUNT), (1, 1, 0.8), 0.07, bottom, False)
                 else:
-                    Tree.generateCylinder((location.center.x,location.center.y,location.center.z + HEIGHT * i / AMOUNT), (1,1,0.8), top, bottom, False)
+                    Tree.generateCylinder((location.center.x, location.center.y,
+                                          location.center.z + HEIGHT * i / AMOUNT), (1, 1, 0.8), top, bottom, False)
                     top = top - 0.2
                     bottom = bottom-0.4
-                bpy.context.object.data.materials.append(createMaterial("pineMaterial", (0.009, 0.141, 0.058, 1.000000))) 
-                    
-                
-                
-            
+                bpy.context.object.data.materials.append(MaterialUtils.createMaterial(
+                    "pineMaterial", (0.009, 0.141, 0.058, 1.000000)))
