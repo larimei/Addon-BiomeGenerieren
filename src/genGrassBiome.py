@@ -159,7 +159,7 @@ class GenerateGrassBiome ():
             rndAroundCenter = mathutils.Vector((random.uniform(grass_face.center.x + rndOffsetPos, grass_face.center.x + rndOffsetNeg), random.uniform(
                 grass_face.center.y + rndOffsetPos, grass_face.center.y + rndOffsetNeg), grass_face.center.z))
             grassObjectCopy.location = (
-                rndAroundCenter.x, rndAroundCenter.y, rndAroundCenter.z + 1)
+                rndAroundCenter.x, rndAroundCenter.y, rndAroundCenter.z)
 
             grassObjectCopy.rotation_euler = (0, 0, random.randrange(0, 360))
             grassObjectCopy.parent = self.GRASSCONTAINER

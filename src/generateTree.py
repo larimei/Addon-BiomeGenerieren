@@ -5,7 +5,7 @@ import random
 import bmesh
 import mathutils
 import math
-from utils import MaterialUtils
+from src import utility
 
 LEAVEMATERIAL: bpy.types.Material
 TRUNKMATERIAL: bpy.types.Material
@@ -104,12 +104,12 @@ class Tree():
         bpy.ops.object.modifier_add(type='SUBSURF')
         bpy.context.object.modifiers["Subdivision"].render_levels = 1
         bpy.context.object.data.materials.append(
-            MaterialUtils.createMaterial("trunkMaterial", (0.038, 0.7, 0.05, 1.000000)))
+            utility.MaterialUtils.createMaterial("trunkMaterial", (0.038, 0.7, 0.05, 1.000000)))
 
         leaves = bpy.ops.mesh.primitive_ico_sphere_add(radius=random.uniform(1, 1.2), enter_editmode=False, align='WORLD', location=(
             posX, posY, posZ), scale=(random.uniform(2.5, 5), random.uniform(2.5, 5), random.uniform(6, 8)))
         bpy.context.object.data.materials.append(
-            MaterialUtils.createMaterial("leaveMaterial", (0.3, 0.152, 0.02, 1.000000)))
+            utility.MaterialUtils.createMaterial("leaveMaterial", (0.3, 0.152, 0.02, 1.000000)))
 
     def generateCylinder(location, scale, width_scale_top, width_scale_bottom, trunk):
         mesh = bpy.ops.mesh.primitive_cylinder_add(
@@ -166,7 +166,7 @@ class Tree():
             if i is 0:
                 Tree.generateCylinder(
                     (location.center.x, location.center.y, location.center.z), (1, 1, 0.75), 0.6, 1, True)
-                bpy.context.object.data.materials.append(MaterialUtils.createMaterial(
+                bpy.context.object.data.materials.append(utility.MaterialUtils.createMaterial(
                     "pineTrunkMaterial", (0.051, 0.010, 0.00, 1.000000)))
             else:
                 if i is AMOUNT:
@@ -177,5 +177,5 @@ class Tree():
                                           location.center.z + HEIGHT * i / AMOUNT), (1, 1, 0.8), top, bottom, False)
                     top = top - 0.2
                     bottom = bottom-0.4
-                bpy.context.object.data.materials.append(MaterialUtils.createMaterial(
+                bpy.context.object.data.materials.append(utility.MaterialUtils.createMaterial(
                     "pineMaterial", (0.009, 0.141, 0.058, 1.000000)))

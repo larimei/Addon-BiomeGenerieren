@@ -3,24 +3,7 @@ import bpy
 import bmesh
 import math
 
-from src import generateTree
-from utils import TextureUtils
-
-
-# class SimpleOperator(bpy.types.Operator):
-#   """Tooltip"""
-#  bl_idname = "object.simple_operator"
-# bl_label = "Simple Object Operator"
-#
-#   @classmethod
-#  def poll(cls, context):
-#     return True
-#
-#   def execute(self, context):
-#      ground = Ground()
-#     ground.generate_ground(context)
-#
-#       return {'FINISHED'}
+from src import utility
 
 
 class Ground():
@@ -39,16 +22,10 @@ class Ground():
     VERTCOUNT_EDGE: int
     BIOME_AMOUNT = 4
     # others
-    faces = []
-    grass_faces = []
-    forest_faces = []
-    desert_faces = []
-    mountain_faces = []
-
-    forest_indexes = []
-    grass_indexes = []
-    desert_indexes = []
-    mountain_indexes = []
+    grass_faces = {}
+    forest_faces = {}
+    desert_faces = {}
+    mountain_faces = {}
 
     def initializeVariable(self, _groundSize, _biome_offset_y, _biome_offset_x, _biome_scale):
         self.ground_size = _groundSize
@@ -86,45 +63,38 @@ class Ground():
             if biome == 0:
                 vert.z = pn.get_height(vert.x, vert.y) * \
                     3 + global_height - 1
-
+                self.addToGrass(
+                    self, linked_faces=ground_mesh.verts[i].link_faces)
             # forest
             elif biome == 1:
                 vert.z = global_height
+                self.addToForest(
+                    self, linked_faces=ground_mesh.verts[i].link_faces)
 
             # desert
             elif biome == 2:
                 canyon_height = dn.get_height(vert.x, vert.y)
                 vert.z = math.pow(canyon_height, 2) * 3 + \
                     0.5 * global_height - 0.5
+                self.addToDesert(
+                    self, linked_faces=ground_mesh.verts[i].link_faces)
             # mountains
             else:
                 mtn_height = mn.get_height(vert.x, vert.y)
                 vert.z = global_height + \
                     math.pow(weight, 3) + math.pow(weight, 2) * mtn_height
-
-            # save face reference in arrays
-            linked_faces = ground_mesh.verts[i].link_faces
-            for j in range(len(linked_faces)):
-                current_face = linked_faces[j]
-                face: BiomeFace = next(
-                    (x for x in self.faces if x.index == current_face.index), None)
-                if(face is not None):
-                    face.biomes.append(biome)
-                else:
-                    new_face: BiomeFace = BiomeFace(index=current_face.index, biomes=[
-                        biome], center=current_face.calc_center_median(), normal=current_face.normal)
-                    self.faces.append(new_face)
+                self.addToMountain(self,
+                                   linked_faces=ground_mesh.verts[i].link_faces)
 
         ground_mesh.to_mesh(ground.data)
         ground_mesh.free()
-        self.allocate_biomes(Ground)
-        self.makeVertexGroup(ground, "forest", self.forest_indexes, generateTree.createMaterial(
+        self.createFaceMask(ground, "forest", list(self.forest_faces.keys()), utility.MaterialUtils.createMaterial(
             "forest", (0.038, 0.7, 0.05, 1.000000)))
-        self.makeVertexGroup(ground, "grass", self.grass_indexes, generateTree.createMaterial(
+        self.createFaceMask(ground, "grass", list(self.grass_faces.keys()), utility.MaterialUtils.createMaterial(
             "grass", (0.09, 0.9, 0.1, 1.000000)))
-        self.makeVertexGroup(ground, "desert", self.desert_indexes, generateTree.createMaterial(
+        self.createFaceMask(ground, "desert", list(self.desert_faces.keys()), utility.MaterialUtils.createMaterial(
             "desert", (0.77, 0.65, 0.39, 1.000000)))
-        self.makeVertexGroup(ground, "mountain", self.mountain_indexes, generateTree.createMaterial(
+        self.createFaceMask(ground, "mountain", list(self.mountain_faces.keys()), utility.MaterialUtils.createMaterial(
             "mountain", (0.4, 0.4, 0.4, 1.000000)))
 
         # Add Decimate Modifier for Tris:
@@ -134,41 +104,50 @@ class Ground():
         bpy.context.object.modifiers["Decimate"].use_collapse_triangulate = True
         bpy.context.object.modifiers["Decimate"].ratio = 0.95
 
-    def makeVertexGroup(object, nameGroup, indexes, material):
-        group = object.vertex_groups.new(name=nameGroup)
-        group.add(indexes, 1.0, 'ADD')
-        print(group)
-        bpy.ops.object.vertex_group_set_active(group=nameGroup)
+    def addToGrass(self, linked_faces):
+        for i in range(len(linked_faces)):
+            current_face: bmesh.types.BMFace = linked_faces[i]
+            self.grass_faces[current_face.index] = BiomeFace(
+                index=current_face.index, center=current_face.calc_center_median(), normal=current_face.normal)
+
+    def addToForest(self, linked_faces):
+        for i in range(len(linked_faces)):
+            current_face: bmesh.types.BMFace = linked_faces[i]
+            self.forest_faces[current_face.index] = BiomeFace(
+                index=current_face.index, center=current_face.calc_center_median(), normal=current_face.normal)
+
+    def addToDesert(self, linked_faces):
+        for i in range(len(linked_faces)):
+            current_face: bmesh.types.BMFace = linked_faces[i]
+            self.desert_faces[current_face.index] = BiomeFace(
+                index=current_face.index, center=current_face.calc_center_median(), normal=current_face.normal)
+
+    def addToMountain(self, linked_faces):
+        for i in range(len(linked_faces)):
+            current_face: bmesh.types.BMFace = linked_faces[i]
+            self.mountain_faces[current_face.index] = BiomeFace(
+                index=current_face.index, center=current_face.calc_center_median(), normal=current_face.normal)
+
+    def createFaceMask(object: bpy.types.Object, nameGroup, indexes, material):
+        faceMap: bpy.types.FaceMap = object.face_maps.new(name=nameGroup)
+        faceMap.add(indexes)
+        print(faceMap.items)
+
+        object.face_maps.active_index = faceMap.index
         bpy.ops.object.material_slot_add()
         object.material_slots[object.material_slots.__len__(
         ) - 1].material = material
         bpy.ops.object.editmode_toggle()  # Go in edit mode
-        bpy.ops.mesh.select_all(action='DESELECT')  # Deselect all the vertices
-        bpy.ops.object.vertex_group_select()  # Select the vertices of the vertex group
-        # QAssign the material on the selected vertices
+        bpy.ops.mesh.select_all(action='DESELECT')  # Deselect all
+        bpy.ops.object.face_map_select()  # Select the faces of the faceMap
+        # Assign the material on the selected faces
         bpy.ops.object.material_slot_assign()
+        bpy.ops.object.face_map_deselect()
         bpy.ops.object.editmode_toggle()  # Return in object mode
-
-    def allocate_biomes(self):
-        for face in self.faces:
-            for biome in face.biomes:
-                if biome == 0:
-                    self.grass_faces.append(face)
-                    self.grass_indexes.append(face.index)
-                if biome == 1:
-                    self.forest_faces.append(face)
-                    self.forest_indexes.append(face.index)
-                if biome == 2:
-                    self.desert_faces.append(face)
-                    self.desert_indexes.append(face.index)
-                if biome == 3:
-                    self.mountain_faces.append(face)
-                    self.mountain_indexes.append(face.index)
 
 
 class BiomeFace:
-    def __init__(self, index, biomes, center, normal):
-        self.biomes = biomes
+    def __init__(self, index, center, normal):
         self.index = index
         self.center = center
         self.normal = normal
@@ -178,7 +157,7 @@ class VoronoiNoise:
 
     def __init__(self, scale: float):
         bpy.ops.texture.new()
-        tex_clr = TextureUtils.getTextureIfExists("Voronoi")
+        tex_clr = utility.TextureUtils.getTextureIfExists("Voronoi")
         tex_clr.name = "Voronoi"
         tex_clr.type = 'VORONOI'
         self.voronoi_clr: bpy.types.VoronoiTexture = bpy.data.textures["Voronoi"]
@@ -187,7 +166,7 @@ class VoronoiNoise:
         self.voronoi_clr.noise_scale = scale
 
         bpy.ops.texture.new()
-        tex_weight = TextureUtils.getTextureIfExists("Weight")
+        tex_weight = utility.TextureUtils.getTextureIfExists("Weight")
         tex_weight.name = "Weight"
         tex_weight.type = 'VORONOI'
         self.voronoi_weight: bpy.types.VoronoiTexture = bpy.data.textures["Weight"]
@@ -216,7 +195,7 @@ class GlobalNoise:
 
     def __init__(self, scale: float):
         bpy.ops.texture.new()
-        tex_clr = TextureUtils.getTextureIfExists("GlobalNoise")
+        tex_clr = utility.TextureUtils.getTextureIfExists("GlobalNoise")
         tex_clr.name = "GlobalNoise"
         tex_clr.type = 'CLOUDS'
         self.cloud: bpy.types.CloudsTexture = bpy.data.textures["GlobalNoise"]
@@ -232,7 +211,7 @@ class MountainNoise:
 
     def __init__(self, scale: float, distortion: float):
         bpy.ops.texture.new()
-        tex_clr = TextureUtils.getTextureIfExists("Mountain")
+        tex_clr = utility.TextureUtils.getTextureIfExists("Mountain")
         tex_clr.name = "Mountain"
         tex_clr.type = 'DISTORTED_NOISE'
         self.mountain: bpy.types.DistortedNoiseTexture = bpy.data.textures["Mountain"]
@@ -248,7 +227,7 @@ class DesertNoise:
 
     def __init__(self, scale: float, turbulence: float):
         bpy.ops.texture.new()
-        tex_clr = TextureUtils.getTextureIfExists("Desert")
+        tex_clr = utility.TextureUtils.getTextureIfExists("Desert")
         tex_clr.name = "Desert"
         tex_clr.type = 'STUCCI'
         self.desert: bpy.types.StucciTexture = bpy.data.textures["Desert"]
@@ -264,7 +243,7 @@ class PlainNoise:
 
     def __init__(self, scale: float, depth: float):
         bpy.ops.texture.new()
-        tex_clr = TextureUtils.getTextureIfExists("Plain")
+        tex_clr = utility.TextureUtils.getTextureIfExists("Plain")
         tex_clr.name = "Plain"
         tex_clr.type = 'CLOUDS'
         self.plain: bpy.types.StucciTexture = bpy.data.textures["Plain"]

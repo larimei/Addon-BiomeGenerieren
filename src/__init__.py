@@ -74,8 +74,8 @@ class GenerateGround(bpy.types.Operator):
                                          int(context.scene.size), int(context.scene.offsetX), int(context.scene.offsetY), float(context.scene.biomeScale))
         ground.Ground.generate_ground(ground.Ground, context)
         # ground--------------------------
-        #GenerateBiomeContent().generateGrassBiome()
-        #GenerateBiomeContent().generateForestBiome()
+        GenerateBiomeContent().generateGrassBiome()
+        # GenerateBiomeContent.generateForestBiome()
         return {'FINISHED'}
 
 
@@ -85,35 +85,50 @@ class GenerateBiomeContent():
         genGrassBiome.GenerateGrassBiome.createMaterials(genGrassBiome)
         grassArray = genGrassBiome.GenerateGrassBiome.createGrassArray(
             genGrassBiome)
-        for i in range(len(ground.Ground.grass_faces)):
+        for face in ground.Ground.grass_faces.values():
+            i = list(ground.Ground.grass_faces).index(face.index)
             rndGrass = random.randint(50, 75)
             if i % rndGrass == 0:
                 genGrassBiome.GenerateGrassBiome.genGrass(
-                    genGrassBiome, grassArray, ground.Ground.grass_faces[i])
+                    genGrassBiome, grassArray, face)
             rndFlowers = random.randint(200, 400)
             if i % rndFlowers == 0:
                 genGrassBiome.GenerateGrassBiome.genFlowers(
-                    genGrassBiome, ground.Ground.grass_faces[i])
+                    genGrassBiome, face)
             rndBushes = random.randint(400, 700)
             if i % rndBushes == 0:
                 genGrassBiome.GenerateGrassBiome.genBushes(
-                    genGrassBiome, ground.Ground.grass_faces[i])
+                    genGrassBiome, face)
+        # for i in range(len(ground.Ground.grass_faces)):
+        #     rndGrass = random.randint(50, 75)
+        #     if i % rndGrass == 0:
+        #         genGrassBiome.GenerateGrassBiome.genGrass(
+        #             genGrassBiome, grassArray, ground.Ground.grass_faces[i])
+        #     rndFlowers = random.randint(200, 400)
+        #     if i % rndFlowers == 0:
+        #         genGrassBiome.GenerateGrassBiome.genFlowers(
+        #             genGrassBiome, ground.Ground.grass_faces[i])
+        #     rndBushes = random.randint(400, 700)
+        #     if i % rndBushes == 0:
+        #         genGrassBiome.GenerateGrassBiome.genBushes(
+        #             genGrassBiome, ground.Ground.grass_faces[i])
 
     def generateForestBiome(GenerateForest):
-        for i in range(len(ground.Ground.forest_faces)):
+        for face in ground.Ground.forest_faces.values():
+            i = list(ground.Ground.forest_faces).index(face.index)
             rndTree = random.randint(250, 275)
             if i % rndTree == 0:
-                generateTree.Tree.generateTree(ground.Ground.forest_faces[i])
+                generateTree.Tree.generateTree(face)
 
     def generateDesertBiome(GenerateGrass):
         # generate Desert content here
-        for i in range(len(ground.Ground.desert_faces)):
-            print(ground.Ground.desert_faces[i])
+        for face in ground.Ground.desert_faces.values():
+            print(face)
 
     def generateMountainBiome(GenerateGrass):
         # generate Mountain content here
-        for i in range(len(ground.Ground.mountain_faces)):
-            print(ground.Ground.mountain_faces[i])
+        for face in ground.Ground.mountain_faces.values():
+            print(face)
 
 
 class SimpleOperator(bpy.types.Operator):
