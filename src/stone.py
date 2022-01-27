@@ -15,24 +15,29 @@ class stone ():
         HEIGHT = abs(WIDTH + DEPTH - 4)
     else:
         HEIGHT = DEPTH / WIDTH + random.uniform(0, 2)
-
+        
     def createMaterial(self) -> bpy.types.Material:
+        
+        GREYTONE = random.uniform(0.25, 0.75)
 
         stoneMaterial: bpy.types.Material = bpy.data.materials.new("Stone Material")
         stoneMaterial.use_nodes = True
 
         stoneNodes: typing.List[bpy.types.Node] = stoneMaterial.node_tree.nodes
-        noiseTex: bpy.types.Node = stoneNodes.new("ShaderNodeTexNoise")
-        voronoiTex: bpy.types.Node = stoneNodes.new("ShaderNodeTexVoronoi")    
+        stoneNodes["Principled BSDF"].inputs[0].default_value = (GREYTONE, GREYTONE, GREYTONE, 1)
+        print(GREYTONE)
 
-        noiseTex.inputs[2].default_value = 15.000
-        noiseTex.inputs[3].default_value = 0.592
-        
-        voronoiTex.inputs[1].default_value = 0
-        voronoiTex.inputs[2].default_value = 1.000
+     #   noiseTex: bpy.types.Node = stoneNodes.new("ShaderNodeTexNoise")
+      #  voronoiTex: bpy.types.Node = stoneNodes.new("ShaderNodeTexVoronoi")    
 
-        stoneMaterial.node_tree.links.new(voronoiTex.outputs[1],noiseTex.inputs[1])
-        stoneMaterial.node_tree.links.new(noiseTex.outputs[1], stoneNodes["Material Output"].inputs[0])
+    #    noiseTex.inputs[2].default_value = 15.000
+  #      noiseTex.inputs[3].default_value = 0.592
+   #     
+ #       voronoiTex.inputs[1].default_value = 0
+#        voronoiTex.inputs[2].default_value = 1.000
+
+    #    stoneMaterial.node_tree.links.new(voronoiTex.outputs[1],noiseTex.inputs[1])
+     #   stoneMaterial.node_tree.links.new(noiseTex.outputs[1], stoneNodes["Material Output"].inputs[0])
 
         return stoneMaterial
 
@@ -48,7 +53,7 @@ class stone ():
         )
         bpy.ops.object.shade_flat()
 
-   #     bpy.context.object.data.materials.append(self.createMaterial())
+        bpy.context.object.data.materials.append(self.createMaterial())
 
         
     # bpy.ops.mesh.primitive_uv_sphere_add(enter_editmode=False, align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))

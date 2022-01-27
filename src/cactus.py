@@ -9,7 +9,18 @@ MIN_SHIFT = 0.5
 MAX_SHIFT = 1.5
 HEIGHT = 1.5
 
+def generateSpikes(object):
 
+    PARTICLES = random.uniform(60, 120)
+    SPIKE_LENGTH = random.uniform(0.2, 0.6)
+    SEED = random.uninform(0,100)
+
+    object.particle_system_add()
+    bpy.data.particles["ParticleSettings"].type = 'HAIR'
+    bpy.data.particles["ParticleSettings"].count = PARTICLES
+    bpy.data.particles["ParticleSettings"].hair_length = SPIKE_LENGTH
+    object.particle_systems["ParticleSettings"].seed = SEED
+    
 def generateBranches(edges, verts, vert, branch, lastIndex):
     for i in range(random.randrange(3, 6)):
         if branch:
@@ -100,8 +111,32 @@ def generateCactus():
 
     bpy.ops.object.select_all(action='SELECT')
  #   bpy.ops.object.join()
+ 
+    PARTICLES = random.uniform(60, 120)
+    SPIKE_LENGTH = random.uniform(0.2, 0.6)
+    SEED = random.uniform(0,100)
+    
+    spikes: bpy.types.ParticleSystem = bpy.ops.object.particle_system_add()
+   # bpy.data.particles["ParticleSettings.007"].use_fake_user = False
+    #spikes.particles["ParticleSettings"].type = 'HAIR'
+    #spikes.particles["ParticleSettings"].count = PARTICLES
+    #spikes.particles["ParticleSettings"].hair_length = SPIKE_LENGTH
+    #object.particle_systems["ParticleSettings"].seed = SEED
+    #bpy.ops.object.shade_flat()
+    bpy.context.object.data.materials.append(createMaterial())
+     
+def createMaterial() -> bpy.types.Material:
+    
+    RED = random.uniform(0.3, 0.6)
+    GREEN = random.uniform(0.2, 0.8)
+        
+    cactusMaterial: bpy.types.Material = bpy.data.materials.new("Cactus Material")
+    cactusMaterial.use_nodes = True
 
-
+    cactusNodes: typing.List[bpy.types.Node] = cactusMaterial.node_tree.nodes
+    cactusNodes["Principled BSDF"].inputs[0].default_value = (RED, GREEN, 0.0, 1)
+    return cactusMaterial
+    
 class CactusBranches(bpy.types.Operator):
     bl_idname = "object.generate_cactus_branches"
     bl_label = "Generate a Cactus"
