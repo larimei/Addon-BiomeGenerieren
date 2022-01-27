@@ -133,9 +133,6 @@ class Ground():
         faceMap.add(indexes)
         print(faceMap.items)
 
-        vertexGroup: bpy.types.VertexGroup = object.vertex_groups.new(name=nameGroup)
-        vertexGroup.add(indexes, 1.0, 'ADD')
-
         object.face_maps.active_index = faceMap.index
         bpy.ops.object.material_slot_add()
         object.material_slots[object.material_slots.__len__(
@@ -143,11 +140,13 @@ class Ground():
         bpy.ops.object.editmode_toggle()  # Go in edit mode
         bpy.ops.mesh.select_all(action='DESELECT')  # Deselect all
         bpy.ops.object.face_map_select()  # Select the faces of the faceMap
+        vertexGroup: bpy.types.VertexGroup = object.vertex_groups.new(
+            name=nameGroup)
+        bpy.ops.object.vertex_group_assign()
         # Assign the material on the selected faces
         bpy.ops.object.material_slot_assign()
         bpy.ops.object.face_map_deselect()
         bpy.ops.object.editmode_toggle()  # Return in object mode
-
 
 
 class BiomeFace:

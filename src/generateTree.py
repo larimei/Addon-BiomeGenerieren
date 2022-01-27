@@ -108,7 +108,7 @@ class Tree():
             utility.MaterialUtils.createMaterial("trunkMaterial", (0.3, 0.152, 0.02, 1.000000)))
 
         leaves = bpy.ops.mesh.primitive_ico_sphere_add(radius=random.uniform(1, 1.2), enter_editmode=False, align='WORLD', location=(
-            posX, posY, posZ), scale=(random.uniform(2.5, 5), random.uniform(2.5, 5), random.uniform(6, 8)))
+            posX, posY, posZ + 4), scale=(random.uniform(2.5, 4), random.uniform(2.5, 4), random.uniform(4, 6)))
         collection.objects.link(bpy.context.object)
         bpy.ops.collection.objects_remove(collection='Collection')
 
