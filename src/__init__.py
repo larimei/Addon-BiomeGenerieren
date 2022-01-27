@@ -4,7 +4,9 @@ import random
 from . import ground
 from . import genGrassBiome
 from . import generateTree
+from . import utility
 import bpy
+
 
 
 bl_info = {
@@ -75,7 +77,7 @@ class GenerateGround(bpy.types.Operator):
         ground.Ground.generate_ground(ground.Ground, context)
         # ground--------------------------
         GenerateBiomeContent().generateGrassBiome()
-        # GenerateBiomeContent.generateForestBiome()
+        GenerateBiomeContent().generateForestBiome()
         return {'FINISHED'}
 
 
@@ -114,11 +116,10 @@ class GenerateBiomeContent():
         #             genGrassBiome, ground.Ground.grass_faces[i])
 
     def generateForestBiome(GenerateForest):
-        for face in ground.Ground.forest_faces.values():
-            i = list(ground.Ground.forest_faces).index(face.index)
-            rndTree = random.randint(250, 275)
-            if i % rndTree == 0:
-                generateTree.Tree.generateTree(face)
+        generateTree.Tree.generateTree(0, 0, 0)
+        utility.ParticleUtils.createParticleSystem(bpy.data.objects["Plane"], "treeParticles","forest", "TreeCollection", 30, 1.0, 0.03, 1)
+        generateTree.Tree.generatePineTree(0,0,0.7)
+        utility.ParticleUtils.createParticleSystem(bpy.data.objects["Plane"], "pineParticles","forest", "PineCollection", 20, 1.0, 0.06, 2)
 
     def generateDesertBiome(GenerateGrass):
         # generate Desert content here

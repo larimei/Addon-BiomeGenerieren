@@ -20,3 +20,27 @@ class MaterialUtils:
         material.node_tree.nodes["Principled BSDF"].inputs[0].default_value = value
 
         return material
+
+
+class ParticleUtils:
+    def createParticleSystem(object, name, vertexGroup, collectionName, count, randomSize, size, seed):
+        bpy.context.view_layer.objects.active = object
+        object.modifiers.new(name, type='PARTICLE_SYSTEM')
+        particleSystem = object.particle_systems[name]
+        particleSystem.settings.type = 'HAIR'
+        particleSystem.settings.render_type = 'COLLECTION'
+        particleSystem.settings.instance_collection = bpy.data.collections[collectionName]
+        particleSystem.settings.child_type = 'INTERPOLATED'
+        particleSystem.settings.count = count
+        particleSystem.settings.particle_size = size
+        particleSystem.settings.size_random = randomSize
+        particleSystem.settings.use_whole_collection = True
+        particleSystem.settings.use_advanced_hair = True
+        particleSystem.settings.rotation_mode = 'NONE'
+        particleSystem.settings.use_even_distribution = False
+        particleSystem.child_seed = seed
+        particleSystem.vertex_group_density = vertexGroup
+
+        #bpy.data.collections[collectionName].hide_render = True
+        #bpy.data.collections[collectionName].hide_viewport = True
+

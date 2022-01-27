@@ -20,7 +20,7 @@ MIN_SHIFT = 0.9
 MAX_SHIFT = 1.1
 
 AMOUNT = 5
-HEIGHT = AMOUNT / 2.2
+HEIGHT = AMOUNT / 4
 
 
 class Tree():
@@ -36,21 +36,22 @@ class Tree():
         Tree.generateTree()
         return {'FINISHED'}
 
-    def generateTree(location):
+    def generateTree(x, y, z):
 
         mesh = bpy.data.meshes.new("tree")  # add the new mesh
         obj = bpy.data.objects.new(mesh.name, mesh)
-        col = bpy.data.collections.get("Collection")
-        col.objects.link(obj)
+        collection = bpy.data.collections.new("TreeCollection")
+        bpy.context.scene.collection.children.link(collection)
+        collection.objects.link(obj)
         bpy.context.view_layer.objects.active = obj
 
         verts = []
         edges = []
 
         for i in range(VERTICES):
-            posZ = i * 0.6 + location.center.z
-            posY = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT) + location.center.y
-            posX = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT) + location.center.x
+            posZ = i * 0.6 + x
+            posY = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT) + y
+            posX = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT) + z
             vert = (posX, posY, posZ)
             verts.append(vert)
             if i != 0:
@@ -104,12 +105,18 @@ class Tree():
         bpy.ops.object.modifier_add(type='SUBSURF')
         bpy.context.object.modifiers["Subdivision"].render_levels = 1
         bpy.context.object.data.materials.append(
-            utility.MaterialUtils.createMaterial("trunkMaterial", (0.038, 0.7, 0.05, 1.000000)))
+            utility.MaterialUtils.createMaterial("trunkMaterial", (0.3, 0.152, 0.02, 1.000000)))
 
         leaves = bpy.ops.mesh.primitive_ico_sphere_add(radius=random.uniform(1, 1.2), enter_editmode=False, align='WORLD', location=(
             posX, posY, posZ), scale=(random.uniform(2.5, 5), random.uniform(2.5, 5), random.uniform(6, 8)))
+        collection.objects.link(bpy.context.object)
+        bpy.ops.collection.objects_remove(collection='Collection')
+
+        bpy.context.object.parent = obj
+
         bpy.context.object.data.materials.append(
-            utility.MaterialUtils.createMaterial("leaveMaterial", (0.3, 0.152, 0.02, 1.000000)))
+            utility.MaterialUtils.createMaterial("leaveMaterial", (0.038, 0.7, 0.05, 1.000000)))
+        
 
     def generateCylinder(location, scale, width_scale_top, width_scale_bottom, trunk):
         mesh = bpy.ops.mesh.primitive_cylinder_add(
@@ -158,24 +165,38 @@ class Tree():
 
         bpy.ops.object.editmode_toggle()
 
-    def generatePineTree(location):
+    def generatePineTree(x, y, z):
+        collection = bpy.data.collections.new("PineCollection")
+        bpy.context.scene.collection.children.link(collection)
         top = AMOUNT * 0.2
         bottom = AMOUNT * 0.55
+        height = 0
 
         for i in range(0, AMOUNT + 1):
             if i is 0:
                 Tree.generateCylinder(
-                    (location.center.x, location.center.y, location.center.z), (1, 1, 0.75), 0.6, 1, True)
+                    (x, y, z), (1, 1, 0.75), 0.6, 1, True)
+
+                active = bpy.context.object
+                collection.objects.link(active)
                 bpy.context.object.data.materials.append(utility.MaterialUtils.createMaterial(
                     "pineTrunkMaterial", (0.051, 0.010, 0.00, 1.000000)))
+                bpy.ops.collection.objects_remove(collection='Collection')
+
             else:
                 if i is AMOUNT:
-                    Tree.generateCylinder((location.center.x, location.center.y, location.center.z +
-                                          HEIGHT * i / AMOUNT), (1, 1, 0.8), 0.07, bottom, False)
+                    Tree.generateCylinder(
+                        (x, y, z + height), (1, 1, 0.8), 0.07, bottom, False)
                 else:
-                    Tree.generateCylinder((location.center.x, location.center.y,
-                                          location.center.z + HEIGHT * i / AMOUNT), (1, 1, 0.8), top, bottom, False)
+                    Tree.generateCylinder(
+                        (x, y, z + height), (1, 1, 0.8), top, bottom, False)
                     top = top - 0.2
                     bottom = bottom-0.4
+
+                height = height + 0.09
+                bpy.context.object.parent = active
+                active = bpy.context.object
+                collection.objects.link(active)
                 bpy.context.object.data.materials.append(utility.MaterialUtils.createMaterial(
                     "pineMaterial", (0.009, 0.141, 0.058, 1.000000)))
+                bpy.ops.collection.objects_remove(collection='Collection')
