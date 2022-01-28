@@ -44,3 +44,14 @@ class ParticleUtils:
         #bpy.data.collections[collectionName].hide_render = True
         #bpy.data.collections[collectionName].hide_viewport = True
 
+
+class CleanCollectionUtils:
+    def cleanSystem():
+        for collection in bpy.data.collections:
+            if collection.name != "Collection":
+                for object in collection.objects:
+                    object.hide_set(True)
+            if collection.name == "Collection":
+                for object in collection.objects:
+                    if object.name != "Plane":
+                        collection.objects.unlink(object)

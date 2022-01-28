@@ -8,7 +8,6 @@ from . import utility
 import bpy
 
 
-
 bl_info = {
     "name": "Generate Biomes",
     "author": "Valentin, Fabian, Viktor, Lara",
@@ -78,6 +77,10 @@ class GenerateGround(bpy.types.Operator):
         # ground--------------------------
         GenerateBiomeContent().generateGrassBiome()
         GenerateBiomeContent().generateForestBiome()
+        # GenerateBiomeContent().generateMountainBiome()
+        # GenerateBiomeContent().generateDesertBiome()
+        utility.CleanCollectionUtils.cleanSystem()
+
         return {'FINISHED'}
 
 
@@ -85,41 +88,24 @@ class GenerateBiomeContent():
 
     def generateGrassBiome(GenerateGrass):
         genGrassBiome.GenerateGrassBiome.createMaterials(genGrassBiome)
-        grassArray = genGrassBiome.GenerateGrassBiome.createGrassArray(
-            genGrassBiome)
-        for face in ground.Ground.grass_faces.values():
-            i = list(ground.Ground.grass_faces).index(face.index)
-            rndGrass = random.randint(50, 75)
-            if i % rndGrass == 0:
-                genGrassBiome.GenerateGrassBiome.genGrass(
-                    genGrassBiome, grassArray, face)
-            rndFlowers = random.randint(200, 400)
-            if i % rndFlowers == 0:
-                genGrassBiome.GenerateGrassBiome.genFlowers(
-                    genGrassBiome, face)
-            rndBushes = random.randint(400, 700)
-            if i % rndBushes == 0:
-                genGrassBiome.GenerateGrassBiome.genBushes(
-                    genGrassBiome, face)
-        # for i in range(len(ground.Ground.grass_faces)):
-        #     rndGrass = random.randint(50, 75)
-        #     if i % rndGrass == 0:
-        #         genGrassBiome.GenerateGrassBiome.genGrass(
-        #             genGrassBiome, grassArray, ground.Ground.grass_faces[i])
-        #     rndFlowers = random.randint(200, 400)
-        #     if i % rndFlowers == 0:
-        #         genGrassBiome.GenerateGrassBiome.genFlowers(
-        #             genGrassBiome, ground.Ground.grass_faces[i])
-        #     rndBushes = random.randint(400, 700)
-        #     if i % rndBushes == 0:
-        #         genGrassBiome.GenerateGrassBiome.genBushes(
-        #             genGrassBiome, ground.Ground.grass_faces[i])
+        genGrassBiome.GenerateGrassBiome.createGrassArray(genGrassBiome)
+        genGrassBiome.GenerateGrassBiome.createFlowersArray(genGrassBiome)
+        genGrassBiome.GenerateGrassBiome.genBushes(genGrassBiome)
+        utility.ParticleUtils.createParticleSystem(
+            bpy.data.objects["Plane"], "grassParticles", "grass", "GrassCollection", 500, 1.0, 0.01, 10)
+        utility.ParticleUtils.createParticleSystem(
+            bpy.data.objects["Plane"], "flowerParticles", "grass", "FlowerCollection", 50, 1.0, 0.01, 3)
+        utility.ParticleUtils.createParticleSystem(
+            bpy.data.objects["Plane"], "bushParticles", "grass", "BushCollection", 10, 1.0, 0.25, 2)
 
     def generateForestBiome(GenerateForest):
         generateTree.Tree.generateTree(0, 0, 0)
-        utility.ParticleUtils.createParticleSystem(bpy.data.objects["Plane"], "treeParticles","forest", "TreeCollection", 30, 1.0, 0.03, 1)
-        generateTree.Tree.generatePineTree(0,0,0.7)
-        utility.ParticleUtils.createParticleSystem(bpy.data.objects["Plane"], "pineParticles","forest", "PineCollection", 20, 1.0, 0.06, 2)
+        utility.ParticleUtils.createParticleSystem(
+            bpy.data.objects["Plane"], "treeParticles", "forest", "TreeCollection", 30, 1.0, 0.03, 1)
+
+        generateTree.Tree.generatePineTree(0, 0, 0.7)
+        utility.ParticleUtils.createParticleSystem(
+            bpy.data.objects["Plane"], "pineParticles", "forest", "PineCollection", 20, 1.0, 0.06, 2)
 
     def generateDesertBiome(GenerateGrass):
         # generate Desert content here
