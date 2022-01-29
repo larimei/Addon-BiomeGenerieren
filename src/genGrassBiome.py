@@ -20,28 +20,8 @@ ROT_TIP_MAX = 90
 ROT_FALLOFF = 5
 # Grass ------------------------
 
-# Materials ------------------------
-GRASSMATERIAL: bpy.types.Material
-BUSHMATERIAL: bpy.types.Material
-STEMMATERIAL: bpy.types.Material
-BLOSSOMMATERIAL: bpy.types.Material
-LEAVESMATERIALS = [None] * 4
-# Materials ------------------------
-
 
 class GenerateGrassBiome ():
-    def createMaterials(self):
-        self.GRASSMATERIAL = utility.MaterialUtils.createMaterial(
-            "grassMaterial", (0, 0.4, 0.1, 1))
-        self.BUSHMATERIAL = utility.MaterialUtils.createMaterial(
-            "bushMaterial", (0, 0.3, 0.2, 1))
-        self.STEMMATERIAL = utility.MaterialUtils.createMaterial(
-            "stemMaterial", (0.4, 0.1, 0, 1))
-        self.BLOSSOMMATERIAL = utility.MaterialUtils.createMaterial(
-            "blossomMaterial", (1, 1, 0.6, 1))
-        for i in range(len(self.LEAVESMATERIALS)-1):
-            self.LEAVESMATERIALS[i] = utility.MaterialUtils.createMaterial(
-                "leaveMaterial", (random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), 1))
 
     def createGrassArray(self):
         collection = bpy.data.collections.new("GrassCollection")
@@ -105,7 +85,8 @@ class GenerateGrassBiome ():
 
             bm.to_mesh(grass_mesh)
             bm.free()
-            grass_object.data.materials.append(self.GRASSMATERIAL)
+            grass_object.data.materials.append(utility.MaterialUtils.createMaterial(
+                "grassMaterial", (0, 0.4, 0.1, 1)))
             collection.objects.link(grass_object)
 
     def createFlowersArray(self):
@@ -153,20 +134,22 @@ class GenerateGrassBiome ():
                 paddel.rotation_euler.z = angle
                 paddel.parent = paddelsContainer
 
-            paddel.data.materials.append(self.LEAVESMATERIALS[flowerIncrement])
+            paddel.data.materials.append(utility.MaterialUtils.createMaterial(
+                "leaveMaterial", (random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), 1)))
             bpy.data.objects.remove(paddelRoot)
             paddelsContainer.parent = flowerParent
             bpy.ops.mesh.primitive_ico_sphere_add(
                 location=(0, 0, 6), scale=(1.75, 1.75, 0.5))
 
-            bpy.context.active_object.data.materials.append(
-                self.BLOSSOMMATERIAL)
+            bpy.context.active_object.data.materials.append(utility.MaterialUtils.createMaterial(
+                "blossomMaterial", (1, 1, 0.6, 1)))
             bpy.context.active_object.name = "blossom"
             bpy.context.active_object.parent = flowerParent
             collection.objects.link(bpy.context.active_object)
             bpy.ops.mesh.primitive_cube_add(
                 location=(0, 0, 2), scale=(0.75, 0.75, 4))
-            bpy.context.active_object.data.materials.append(self.STEMMATERIAL)
+            bpy.context.active_object.data.materials.append(utility.MaterialUtils.createMaterial(
+                "stemMaterial", (0.4, 0.1, 0, 1)))
             bpy.context.active_object.name = "steam"
             collection.objects.link(bpy.context.active_object)
             bpy.context.active_object.parent = flowerParent
@@ -187,7 +170,8 @@ class GenerateGrassBiome ():
             bushData = bpy.context.active_object.data
             bushObject: bpy.types.Object = bpy.context.active_object
 
-            bushObject.data.materials.append(self.BUSHMATERIAL)
+            bushObject.data.materials.append(utility.MaterialUtils.createMaterial(
+                "bushMaterial", (0, 0.3, 0.2, 1)))
             bpy.ops.mesh.select_mode(type="VERT")
             bm = bmesh.from_edit_mesh(bushData)
 

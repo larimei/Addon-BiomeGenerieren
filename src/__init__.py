@@ -92,7 +92,6 @@ class GenerateGround(bpy.types.Operator):
 class GenerateBiomeContent():
 
     def generateGrassBiome(GenerateGrass):
-        genGrassBiome.GenerateGrassBiome.createMaterials(genGrassBiome)
         genGrassBiome.GenerateGrassBiome.createGrassArray(genGrassBiome)
         genGrassBiome.GenerateGrassBiome.createFlowersArray(genGrassBiome)
         genGrassBiome.GenerateGrassBiome.genBushes(genGrassBiome)
