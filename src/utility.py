@@ -45,7 +45,7 @@ class ParticleUtils:
         #bpy.data.collections[collectionName].hide_viewport = True
 
 
-class CleanCollectionUtils:
+class CleanCollectionsUtils:
     def cleanSystem():
         for collection in bpy.data.collections:
             if collection.name != "Collection":

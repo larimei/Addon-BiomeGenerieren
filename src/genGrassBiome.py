@@ -4,6 +4,8 @@ import mathutils
 import random
 import bpy
 
+from src import utility
+
 # Grass ------------------------
 WIDTH_MAX = 0.6
 WIDTH_MIN = 0.03
@@ -29,33 +31,17 @@ LEAVESMATERIALS = [None] * 4
 
 class GenerateGrassBiome ():
     def createMaterials(self):
-        self.GRASSMATERIAL = bpy.data.materials.new(
-            name="grassMaterial")
-        self.GRASSMATERIAL.use_nodes = True
-        self.GRASSMATERIAL.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
-            0, 0.4, 0.1, 1)
-        self.BUSHMATERIAL = bpy.data.materials.new(
-            name="bushMaterial")
-        self.BUSHMATERIAL.use_nodes = True
-        self.BUSHMATERIAL.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
-            0, 0.3, 0.2, 1)
-        self.STEMMATERIAL = bpy.data.materials.new(
-            name="stemMaterial")
-        self.STEMMATERIAL.use_nodes = True
-        self.STEMMATERIAL.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
-            0.4, 0.1, 0, 1)
-        self.BLOSSOMMATERIAL = bpy.data.materials.new(
-            name="blossomMaterial")
-        self.BLOSSOMMATERIAL.use_nodes = True
-        self.BLOSSOMMATERIAL.node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
-            1, 1, 0.6, 1)
-
+        self.GRASSMATERIAL = utility.MaterialUtils.createMaterial(
+            "grassMaterial", (0, 0.4, 0.1, 1))
+        self.BUSHMATERIAL = utility.MaterialUtils.createMaterial(
+            "bushMaterial", (0, 0.3, 0.2, 1))
+        self.STEMMATERIAL = utility.MaterialUtils.createMaterial(
+            "stemMaterial", (0.4, 0.1, 0, 1))
+        self.BLOSSOMMATERIAL = utility.MaterialUtils.createMaterial(
+            "blossomMaterial", (1, 1, 0.6, 1))
         for i in range(len(self.LEAVESMATERIALS)-1):
-            self.LEAVESMATERIALS[i] = bpy.data.materials.new(
-                name="blossomMaterial")
-            self.LEAVESMATERIALS[i].use_nodes = True
-            self.LEAVESMATERIALS[i].node_tree.nodes["Principled BSDF"].inputs[0].default_value = (
-                random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), 1)
+            self.LEAVESMATERIALS[i] = utility.MaterialUtils.createMaterial(
+                "leaveMaterial", (random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), 1))
 
     def createGrassArray(self):
         collection = bpy.data.collections.new("GrassCollection")
@@ -143,8 +129,7 @@ class GenerateGrassBiome ():
             c = bm.faces[1].calc_center_median()
             for v in bm.faces[1].verts:
                 v.co = c + 2 * (v.co - c)
-                #
-            # Show the updates in the viewport
+
             bmesh.update_edit_mesh(paddelData, True)
             bpy.ops.object.mode_set(mode='OBJECT')
 

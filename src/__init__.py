@@ -47,9 +47,9 @@ class MainPanel(bpy.types.Panel):
         col.prop(context.scene, "biomeScale")
         row = layout.row()
         # insert operator
-        row.operator("gen.landscape", text="Generate")
+        row.operator("gen.landscape", text="Generate Scene")
         # insert operator
-        row.operator("delete.all", text="Delete all")
+        row.operator("delete.all", text="Reset Scene")
 
 
 class DeleteAll(bpy.types.Operator):
@@ -62,6 +62,10 @@ class DeleteAll(bpy.types.Operator):
         # löscht selektierte objekte
         bpy.ops.object.delete(use_global=False, confirm=False)
         bpy.ops.outliner.orphans_purge()  # löscht überbleibende Meshdaten etc.
+        for collection in bpy.data.collections:
+            if collection.name != "Collection":
+                bpy.data.collections.remove(collection)
+
         return {'FINISHED'}
 
 
@@ -70,6 +74,7 @@ class GenerateGround(bpy.types.Operator):
     bl_label = "Button text"
 
     def execute(self, context):
+        DeleteAll.execute(DeleteAll, context)
         # ground--------------------------
         ground.Ground.initializeVariable(ground.Ground,
                                          int(context.scene.size), int(context.scene.offsetX), int(context.scene.offsetY), float(context.scene.biomeScale))
@@ -79,7 +84,7 @@ class GenerateGround(bpy.types.Operator):
         GenerateBiomeContent().generateForestBiome()
         # GenerateBiomeContent().generateMountainBiome()
         # GenerateBiomeContent().generateDesertBiome()
-        utility.CleanCollectionUtils.cleanSystem()
+        utility.CleanCollectionsUtils.cleanSystem()
 
         return {'FINISHED'}
 
@@ -92,11 +97,11 @@ class GenerateBiomeContent():
         genGrassBiome.GenerateGrassBiome.createFlowersArray(genGrassBiome)
         genGrassBiome.GenerateGrassBiome.genBushes(genGrassBiome)
         utility.ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "grassParticles", "grass", "GrassCollection", 500, 1.0, 0.01, 10)
+            bpy.data.objects["Plane"], "grassParticles", "grass", "GrassCollection", 500, 1.0, 0.01, 1)
         utility.ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "flowerParticles", "grass", "FlowerCollection", 50, 1.0, 0.01, 3)
+            bpy.data.objects["Plane"], "flowerParticles", "grass", "FlowerCollection", 50, 1.0, 0.01, 1)
         utility.ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "bushParticles", "grass", "BushCollection", 10, 1.0, 0.25, 2)
+            bpy.data.objects["Plane"], "bushParticles", "grass", "BushCollection", 10, 1.0, 0.25, 1)
 
     def generateForestBiome(GenerateForest):
         generateTree.Tree.generateTree(0, 0, 0)
