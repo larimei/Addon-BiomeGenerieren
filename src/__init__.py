@@ -49,16 +49,24 @@ class GenerateGround(bpy.types.Operator):
     def execute(self, context):
         DeleteAll.execute(DeleteAll, context)
         # ground--------------------------
+        weights = [float(context.scene.grassWeight), float(context.scene.forestWeight), float(
+            context.scene.desertWeight), float(context.scene.mountainWeight)]
         ground.Ground.initializeVariable(ground.Ground,
-                                         int(context.scene.size), int(context.scene.offsetX), int(context.scene.offsetY), float(context.scene.biomeScale))
+                                         int(context.scene.size), int(context.scene.offsetX), int(context.scene.offsetY), float(context.scene.biomeScale), weights)
         ground.Ground.generate_ground(ground.Ground, context)
-        # ground--------------------------
+        # grass--------------------------
         GenerateBiomeContent().generateGrassBiome(int(context.scene.grassCount),
                                                   int(context.scene.flowerCount), int(context.scene.bushCount))
+        # forest--------------------------
         GenerateBiomeContent().generateForestBiome(
             int(context.scene.treeCount), int(context.scene.pineCount))
-        # GenerateBiomeContent().generateMountainBiome()
+
+        # desert--------------------------
         # GenerateBiomeContent().generateDesertBiome()
+
+        # mountain--------------------------
+        # GenerateBiomeContent().generateMountainBiome()
+
         utility.CleanCollectionsUtils.cleanSystem()
 
         return {'FINISHED'}
@@ -116,7 +124,7 @@ def main(context):
         print(ob)
 
 
-classes = [ui.MainPanel, ui.DesertPanel, ui.ForestPanel, ui.GrassPanel, SimpleOperator,
+classes = [ui.MainPanel, ui.DistributionPanel, ui.DesertPanel, ui.ForestPanel, ui.GrassPanel, SimpleOperator,
            GenerateGround, DeleteAll]
 
 
@@ -163,6 +171,42 @@ def register():
         name="Pine Count",
         default=20
     )
+    bpy.types.Scene.grassWeight = bpy.props.FloatProperty(
+        name="Grass Biome Weight",
+        default=1.0,
+        min=0.0,
+        max=1.0,
+        soft_min=0.0,
+        soft_max=1.0,
+        step=10
+    )
+    bpy.types.Scene.forestWeight = bpy.props.FloatProperty(
+        name="Forest Biome Weight",
+        default=1.0,
+        min=0.0,
+        max=1.0,
+        soft_min=0.0,
+        soft_max=1.0,
+        step=10
+    )
+    bpy.types.Scene.desertWeight = bpy.props.FloatProperty(
+        name="Desert Biome Weight",
+        default=1.0,
+        min=0.0,
+        max=1.0,
+        soft_min=0.0,
+        soft_max=1.0,
+        step=10
+    )
+    bpy.types.Scene.mountainWeight = bpy.props.FloatProperty(
+        name="Mountain Biome Weight",
+        default=1.0,
+        min=0.0,
+        max=1.0,
+        soft_min=0.0,
+        soft_max=1.0,
+        step=10
+    )
 
 
 def unregister():
@@ -172,6 +216,16 @@ def unregister():
     del bpy.types.Scene.offsetX
     del bpy.types.Scene.offsetY
     del bpy.types.Scene.biomeScale
+    del bpy.types.Scene.cactusCount
+    del bpy.types.Scene.grassCount
+    del bpy.types.Scene.flowerCount
+    del bpy.types.Scene.bushCount
+    del bpy.types.Scene.treeCount
+    del bpy.types.Scene.pineCount
+    del bpy.types.Scene.grassWeight
+    del bpy.types.Scene.forestWeight
+    del bpy.types.Scene.desertWeight
+    del bpy.types.Scene.mountainWeight
 
 
 if __name__ == "__main__":

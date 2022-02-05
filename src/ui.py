@@ -35,6 +35,23 @@ class MainPanel(bpy.types.Panel):
         row2.operator("delete.all", text="Reset Scene")
 
 
+class DistributionPanel(bpy.types.Panel):
+    bl_label = "Biome Distribution Settings"
+    bl_idname = "GENERATEBIOMES_PT_DistributionPanel"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Generate Biomes'
+
+    def draw(self, context):
+        layout = self.layout
+        col = layout.column()
+        col.use_property_split = True
+        col.prop(context.scene, "grassWeight", text="Grass Weight")
+        col.prop(context.scene, "forestWeight", text="Forest Weight")
+        col.prop(context.scene, "desertWeight", text="Desert Weight")
+        col.prop(context.scene, "mountainWeight", text="Mountain Weight")
+
+
 class DesertPanel(bpy.types.Panel):
     bl_label = "Desert Settings"
     bl_idname = "GENERATEBIOMES_PT_DesertPanel"

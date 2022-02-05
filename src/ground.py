@@ -16,6 +16,10 @@ class Ground():
     # float
     face_edge_size = 0.5
     biome_scale: float
+    grass_weight: float
+    forest_weight: float
+    desert_weight: float
+    mountain_weight: float
 
     # constants that are effected by input
     SUBDIVISION_LEVELS: float
@@ -27,13 +31,17 @@ class Ground():
     desert_faces = {}
     mountain_faces = {}
 
-    def initializeVariable(self, _groundSize, _biome_offset_y, _biome_offset_x, _biome_scale):
+    def initializeVariable(self, _groundSize, _biome_offset_y, _biome_offset_x, _biome_scale, weights):
         self.ground_size = _groundSize
         self.biome_offset_x = _biome_offset_x
         self.biome_offset_y = _biome_offset_y
         self.biome_scale = _biome_scale
         self.SUBDIVISION_LEVELS = self.ground_size / self.face_edge_size - 1
         self.VERTCOUNT_EDGE = round(self.SUBDIVISION_LEVELS + 2)
+        self.grass_weight = weights[0]
+        self.forest_weight = weights[1]
+        self.desert_weight = weights[2]
+        self.mountain_weight = weights[3]
 
     def generate_ground(self, context):
         bpy.ops.mesh.primitive_plane_add(
@@ -48,7 +56,8 @@ class Ground():
         ground_mesh.from_mesh(ground.data)
         ground_mesh.verts.ensure_lookup_table()
 
-        v = VoronoiNoise(scale=self.biome_scale)
+        v = VoronoiNoise(self.biome_scale, self.grass_weight,
+                         self.forest_weight, self.desert_weight, self.mountain_weight)
         hn = GlobalNoise(scale=6)
         mn = MountainNoise(scale=0.4, distortion=0.3)
         dn = DesertNoise(scale=4, turbulence=200)
@@ -157,8 +166,12 @@ class BiomeFace:
 
 
 class VoronoiNoise:
+    distribution = []
+    biome_allowed = []
 
-    def __init__(self, scale: float):
+    def __init__(self, scale: float, grassWeight, forestWeight, desertWeight, mountainWeight):
+        self.distribution, self.biome_allowed = self.calcDistributions(
+            grassWeight, forestWeight, desertWeight, mountainWeight)
         bpy.ops.texture.new()
         tex_clr = utility.TextureUtils.getTextureIfExists("Voronoi")
         tex_clr.name = "Voronoi"
@@ -183,15 +196,32 @@ class VoronoiNoise:
         color = colors[1]
         weight = 0
         biome = 0
-        if color >= 0.75:
+        if color >= self.distribution[3] and self.biome_allowed[3]:
             biome = 3
             weight = (weights[3] - 1) * (-1)
             weight = (weight * weight) * 2
-        elif color >= 0.5:
+        elif color >= self.distribution[2] and self.biome_allowed[2]:
             biome = 2
-        elif color >= 0.25:
+        elif color >= self.distribution[1] and self.biome_allowed[1]:
             biome = 1
+        elif color >= self.distribution[0] and self.biome_allowed[0]:
+            biome = 0
         return biome, weight
+
+    def calcDistributions(self, grassW, forestW, desertW, mountainW):
+        total = grassW + forestW + desertW + mountainW
+        mtnDist = total - mountainW
+        desertDist = mtnDist - desertW
+        forestDist = desertDist - forestW
+        grassDist = 0
+        flags = [bool(grassW), bool(forestW), bool(desertW), bool(mountainW)]
+        if bool(total):
+            distribution = [grassDist, (forestDist/total),
+                            (desertDist/total), (mtnDist/total)]
+            return distribution, flags
+        else:
+            distribution = [0, 0, 0, 0]
+            return distribution, flags
 
 
 class GlobalNoise:
