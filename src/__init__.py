@@ -52,7 +52,7 @@ class GenerateGround(bpy.types.Operator):
         weights = [float(context.scene.grassWeight), float(context.scene.forestWeight), float(
             context.scene.desertWeight), float(context.scene.mountainWeight)]
         ground.Ground.initializeVariable(ground.Ground,
-                                         int(context.scene.size), int(context.scene.offsetX), int(context.scene.offsetY), float(context.scene.biomeScale), weights)
+                                         int(context.scene.size), int(context.scene.offsetX), int(context.scene.offsetY), float(context.scene.biomeScale), float(context.scene.snowBorder), weights)
         ground.Ground.generate_ground(ground.Ground, context)
         # grass--------------------------
         GenerateBiomeContent().generateGrassBiome(int(context.scene.grassCount),
@@ -105,26 +105,12 @@ class GenerateBiomeContent():
             print(face)
 
 
-class SimpleOperator(bpy.types.Operator):
-    """Tooltip"""
-    bl_idname = "object.simple_operator"
-    bl_label = "Simple Object Operator"
-
-    @ classmethod
-    def poll(cls, context):
-        return context.active_object is not None
-
-    def execute(self, context):
-        main(context)
-        return {'FINISHED'}
-
-
 def main(context):
     for ob in context.scene.objects:
         print(ob)
 
 
-classes = [ui.MainPanel, ui.DistributionPanel, ui.DesertPanel, ui.ForestPanel, ui.GrassPanel, SimpleOperator,
+classes = [ui.MainPanel, ui.DistributionPanel, ui.DesertPanel, ui.ForestPanel, ui.GrassPanel, ui.MountainPanel,
            GenerateGround, DeleteAll]
 
 
@@ -170,6 +156,13 @@ def register():
     bpy.types.Scene.pineCount = bpy.props.IntProperty(
         name="Pine Count",
         default=20
+    )
+    bpy.types.Scene.snowBorder = bpy.props.FloatProperty(
+        name="Snow Border Height",
+        default=6.5,
+        soft_min=0.0,
+        soft_max=1.0,
+        step=10
     )
     bpy.types.Scene.grassWeight = bpy.props.FloatProperty(
         name="Grass Biome Weight",

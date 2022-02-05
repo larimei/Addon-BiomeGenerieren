@@ -95,3 +95,17 @@ class ForestPanel(bpy.types.Panel):
         col.use_property_split = True
         col.prop(context.scene, "treeCount", text="Tree Count")
         col.prop(context.scene, "pineCount", text="Pine Count")
+
+
+class MountainPanel(bpy.types.Panel):
+    bl_label = "Mountain Settings"
+    bl_idname = "GENERATEBIOMES_PT_MountainPanel"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Generate Biomes'
+
+    def draw(self, context):
+        layout = self.layout
+        col = layout.column()
+        col.use_property_split = True
+        col.prop(context.scene, "snowBorder", text="Snow Border Height")

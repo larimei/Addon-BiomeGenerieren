@@ -1,4 +1,5 @@
 
+import random
 import bpy
 import bmesh
 import math
@@ -20,6 +21,7 @@ class Ground():
     forest_weight: float
     desert_weight: float
     mountain_weight: float
+    snowfall_border: float
 
     # constants that are effected by input
     SUBDIVISION_LEVELS: float
@@ -30,8 +32,9 @@ class Ground():
     forest_faces = {}
     desert_faces = {}
     mountain_faces = {}
+    snow_faces = {}
 
-    def initializeVariable(self, _groundSize, _biome_offset_y, _biome_offset_x, _biome_scale, weights):
+    def initializeVariable(self, _groundSize, _biome_offset_y, _biome_offset_x, _biome_scale, _snow_border, weights):
         self.ground_size = _groundSize
         self.biome_offset_x = _biome_offset_x
         self.biome_offset_y = _biome_offset_y
@@ -42,6 +45,7 @@ class Ground():
         self.forest_weight = weights[1]
         self.desert_weight = weights[2]
         self.mountain_weight = weights[3]
+        self.snowfall_border = _snow_border
 
     def generate_ground(self, context):
         bpy.ops.mesh.primitive_plane_add(
@@ -92,8 +96,12 @@ class Ground():
                 mtn_height = mn.get_height(vert.x, vert.y)
                 vert.z = global_height + \
                     math.pow(weight, 3) + math.pow(weight, 2) * mtn_height
-                self.addToMountain(self,
+                if(vert.z >= (self.snowfall_border + random.uniform(0, 1))):
+                    self.addToSnow(self,
                                    linked_faces=ground_mesh.verts[i].link_faces)
+                else:
+                    self.addToMountain(self,
+                                       linked_faces=ground_mesh.verts[i].link_faces)
 
         ground_mesh.to_mesh(ground.data)
         ground_mesh.free()
@@ -105,6 +113,8 @@ class Ground():
             "desert", (0.77, 0.65, 0.39, 1.000000)))
         self.createFaceMask(ground, "mountain", list(self.mountain_faces.keys()), utility.MaterialUtils.createMaterial(
             "mountain", (0.4, 0.4, 0.4, 1.000000)))
+        self.createFaceMask(ground, "snow", list(self.snow_faces.keys()), utility.MaterialUtils.createMaterial(
+            "snow", (0.95, 0.95, 0.95, 1.000000)))
 
         # Add Decimate Modifier for Tris:
         bpy.ops.object.select_pattern(
@@ -135,6 +145,12 @@ class Ground():
         for i in range(len(linked_faces)):
             current_face: bmesh.types.BMFace = linked_faces[i]
             self.mountain_faces[current_face.index] = BiomeFace(
+                index=current_face.index, center=current_face.calc_center_median(), normal=current_face.normal)
+
+    def addToSnow(self, linked_faces):
+        for i in range(len(linked_faces)):
+            current_face: bmesh.types.BMFace = linked_faces[i]
+            self.snow_faces[current_face.index] = BiomeFace(
                 index=current_face.index, center=current_face.calc_center_median(), normal=current_face.normal)
 
     def createFaceMask(object: bpy.types.Object, nameGroup, indexes, material):
