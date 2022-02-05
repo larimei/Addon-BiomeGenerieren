@@ -5,6 +5,7 @@ from . import ground
 from . import genGrassBiome
 from . import generateTree
 from . import utility
+from . import ui
 import bpy
 
 
@@ -22,34 +23,6 @@ bl_info = {
 
 # from .  import ui
 # This is the Main Panel in 3DView
-
-
-class MainPanel(bpy.types.Panel):
-    bl_label = "Generate Biomes"
-    bl_idname = "script.execute_preset"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'Generate Biomes'
-
-    def draw(self, context):
-
-        layout = self.layout
-        layout.scale_x = 8
-        layout.scale_y = 4
-
-        row = layout.row()
-        row.label(text="Add a biome", icon='WORLD')
-
-        col = self.layout.column(align=True)
-        col.prop(context.scene, "size")
-        col.prop(context.scene, "offsetX")
-        col.prop(context.scene, "offsetY")
-        col.prop(context.scene, "biomeScale")
-        row = layout.row()
-        # insert operator
-        row.operator("gen.landscape", text="Generate Scene")
-        # insert operator
-        row.operator("delete.all", text="Reset Scene")
 
 
 class DeleteAll(bpy.types.Operator):
@@ -80,8 +53,10 @@ class GenerateGround(bpy.types.Operator):
                                          int(context.scene.size), int(context.scene.offsetX), int(context.scene.offsetY), float(context.scene.biomeScale))
         ground.Ground.generate_ground(ground.Ground, context)
         # ground--------------------------
-        GenerateBiomeContent().generateGrassBiome()
-        GenerateBiomeContent().generateForestBiome()
+        GenerateBiomeContent().generateGrassBiome(int(context.scene.grassCount),
+                                                  int(context.scene.flowerCount), int(context.scene.bushCount))
+        GenerateBiomeContent().generateForestBiome(
+            int(context.scene.treeCount), int(context.scene.pineCount))
         # GenerateBiomeContent().generateMountainBiome()
         # GenerateBiomeContent().generateDesertBiome()
         utility.CleanCollectionsUtils.cleanSystem()
@@ -91,25 +66,25 @@ class GenerateGround(bpy.types.Operator):
 
 class GenerateBiomeContent():
 
-    def generateGrassBiome(GenerateGrass):
+    def generateGrassBiome(GenerateGrass, grassCount, flowerCount, bushCount):
         genGrassBiome.GenerateGrassBiome.createGrassArray(genGrassBiome)
         genGrassBiome.GenerateGrassBiome.createFlowersArray(genGrassBiome)
         genGrassBiome.GenerateGrassBiome.genBushes(genGrassBiome)
         utility.ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "grassParticles", "grass", "GrassCollection", 500, 1.0, 0.01, 1)
+            bpy.data.objects["Plane"], "grassParticles", "grass", "GrassCollection", grassCount, 1.0, 0.01, 1)
         utility.ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "flowerParticles", "grass", "FlowerCollection", 50, 1.0, 0.01, 1)
+            bpy.data.objects["Plane"], "flowerParticles", "grass", "FlowerCollection", flowerCount, 1.0, 0.01, 1)
         utility.ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "bushParticles", "grass", "BushCollection", 10, 1.0, 0.25, 1)
+            bpy.data.objects["Plane"], "bushParticles", "grass", "BushCollection", bushCount, 1.0, 0.25, 1)
 
-    def generateForestBiome(GenerateForest):
+    def generateForestBiome(GenerateForest, treeCount, pineCount):
         generateTree.Tree.generateTree(0, 0, 0)
         utility.ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "treeParticles", "forest", "TreeCollection", 30, 1.0, 0.03, 1)
+            bpy.data.objects["Plane"], "treeParticles", "forest", "TreeCollection", treeCount, 1.0, 0.03, 1)
 
         generateTree.Tree.generatePineTree(0, 0, 0.7)
         utility.ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "pineParticles", "forest", "PineCollection", 20, 1.0, 0.06, 2)
+            bpy.data.objects["Plane"], "pineParticles", "forest", "PineCollection", pineCount, 1.0, 0.06, 2)
 
     def generateDesertBiome(GenerateGrass):
         # generate Desert content here
@@ -141,7 +116,7 @@ def main(context):
         print(ob)
 
 
-classes = [MainPanel, SimpleOperator,
+classes = [ui.MainPanel, ui.DesertPanel, ui.ForestPanel, ui.GrassPanel, SimpleOperator,
            GenerateGround, DeleteAll]
 
 
@@ -150,23 +125,43 @@ def register():
         bpy.utils.register_class(cls)
     bpy.types.Scene.size = bpy.props.IntProperty(
         name="Ground Mesh Size",
-        description="My description",
         default=80
     )
     bpy.types.Scene.offsetX = bpy.props.IntProperty(
-        name="Biom offset X",
-        description="My description",
+        name="Biome offset X",
         default=10
     )
     bpy.types.Scene.offsetY = bpy.props.IntProperty(
-        name="Biom offset Y",
-        description="My description",
+        name="Biome offset Y",
         default=10
     )
     bpy.types.Scene.biomeScale = bpy.props.FloatProperty(
         name="Biome Scale",
-        description="My description",
         default=20.0
+    )
+    bpy.types.Scene.cactusCount = bpy.props.IntProperty(
+        name="Cactus Count",
+        default=50
+    )
+    bpy.types.Scene.grassCount = bpy.props.IntProperty(
+        name="Grass Count",
+        default=500
+    )
+    bpy.types.Scene.flowerCount = bpy.props.IntProperty(
+        name="Flower Count",
+        default=50
+    )
+    bpy.types.Scene.bushCount = bpy.props.IntProperty(
+        name="Bush Count",
+        default=10
+    )
+    bpy.types.Scene.treeCount = bpy.props.IntProperty(
+        name="Tree Count",
+        default=30
+    )
+    bpy.types.Scene.pineCount = bpy.props.IntProperty(
+        name="Pine Count",
+        default=20
     )
 
 
