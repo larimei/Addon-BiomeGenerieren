@@ -41,9 +41,6 @@ class ParticleUtils:
         particleSystem.child_seed = seed
         particleSystem.vertex_group_density = vertexGroup
 
-        #bpy.data.collections[collectionName].hide_render = True
-        #bpy.data.collections[collectionName].hide_viewport = True
-
 
 class CleanCollectionsUtils:
     def cleanSystem():

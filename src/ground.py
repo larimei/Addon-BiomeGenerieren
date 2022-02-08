@@ -155,8 +155,8 @@ class Ground():
 
     def createFaceMask(object: bpy.types.Object, nameGroup, indexes, material):
         faceMap: bpy.types.FaceMap = object.face_maps.new(name=nameGroup)
+
         faceMap.add(indexes)
-        print(faceMap.items)
 
         object.face_maps.active_index = faceMap.index
         bpy.ops.object.material_slot_add()
@@ -164,13 +164,44 @@ class Ground():
         ) - 1].material = material
         bpy.ops.object.editmode_toggle()  # Go in edit mode
         bpy.ops.mesh.select_all(action='DESELECT')  # Deselect all
-        bpy.ops.object.face_map_select()  # Select the faces of the faceMap
-        vertexGroup: bpy.types.VertexGroup = object.vertex_groups.new(
-            name=nameGroup)
-        bpy.ops.object.vertex_group_assign()
+        bpy.ops.object.face_map_select()  # Select the faces of the faceMap       
+
         # Assign the material on the selected faces
         bpy.ops.object.material_slot_assign()
+        
+        bpy.ops.mesh.select_less()
+        bpy.ops.mesh.select_less()
+        Verts = [i.index for i in bmesh.from_edit_mesh(
+            bpy.context.active_object.data).verts if i.select]
+
         bpy.ops.object.face_map_deselect()
+        bpy.ops.object.editmode_toggle()  # Return in object mode
+
+        vertexGroup: bpy.types.VertexGroup = object.vertex_groups.new(
+            name=nameGroup)
+        vertexGroup.add(Verts, 1.0, 'REPLACE')
+
+        Ground.createGradient(object, nameGroup, utility.MaterialUtils.createMaterial(
+            "snow", (1, 1, 1, 1)))
+
+    def createGradient(object: bpy.types.Object, name, material):
+        bpy.ops.object.editmode_toggle()  # Go in edit mode
+        bpy.ops.mesh.select_all(action='DESELECT')  # Deselect all       
+
+        bpy.ops.object.material_slot_add()
+        object.material_slots[object.material_slots.__len__(
+        ) - 1].material = material
+
+       
+        vertex_group = object.vertex_groups.find(name)
+        object.vertex_groups.active_index = vertex_group
+        bpy.ops.object.vertex_group_select()
+        bpy.ops.mesh.select_more()
+        bpy.ops.object.vertex_group_deselect()
+
+
+        bpy.ops.object.material_slot_assign()
+        bpy.ops.mesh.select_all(action='DESELECT')  # Deselect all
         bpy.ops.object.editmode_toggle()  # Return in object mode
 
 

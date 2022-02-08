@@ -96,6 +96,7 @@ class ForestPanel(bpy.types.Panel):
         col.use_property_split = True
         col.prop(context.scene, "treeCount", text="Tree Count")
         col.prop(context.scene, "pineCount", text="Pine Count")
+        col.prop(context.scene, "branchCount", text="Tree With Branches Count")
 
 
 class MountainPanel(bpy.types.Panel):

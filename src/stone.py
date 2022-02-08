@@ -28,7 +28,6 @@ class Stone ():
         stoneNodes: typing.List[bpy.types.Node] = stoneMaterial.node_tree.nodes
         stoneNodes["Principled BSDF"].inputs[0].default_value = (
             GREYTONE, GREYTONE, GREYTONE, 1)
-        print(GREYTONE)
 
      #   noiseTex: bpy.types.Node = stoneNodes.new("ShaderNodeTexNoise")
       #  voronoiTex: bpy.types.Node = stoneNodes.new("ShaderNodeTexVoronoi")
