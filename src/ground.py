@@ -114,6 +114,17 @@ class Ground():
         self.createFaceMask(ground, "snow", list(self.snow_faces.keys()), utility.MaterialUtils.createMaterial(
             "snow", self.colors[4]))
 
+        Ground.createGradient(ground, 'desert', 'forest', utility.MaterialUtils.createMaterial(
+            "desert-forest", (0, 0, 0, 1)))
+        Ground.createGradient(ground, 'desert', 'grass', utility.MaterialUtils.createMaterial(
+            "desert-grass", (0, 0, 0, 1)))
+        Ground.createGradient(ground, 'mountain', 'forest', utility.MaterialUtils.createMaterial(
+            "forest-mountain", (0, 0, 0, 1)))
+        Ground.createGradient(ground, 'forest', 'grass', utility.MaterialUtils.createMaterial(
+            "forest-grass", (0, 0, 0, 1)))
+        Ground.createGradient(ground, 'mountain', 'grass', utility.MaterialUtils.createMaterial(
+            "grass-mountain", (0, 0, 0, 1)))
+
         # Add Decimate Modifier for Tris:
         bpy.ops.object.select_pattern(
             pattern="Ground", case_sensitive=True, extend=False)
@@ -162,11 +173,11 @@ class Ground():
         ) - 1].material = material
         bpy.ops.object.editmode_toggle()  # Go in edit mode
         bpy.ops.mesh.select_all(action='DESELECT')  # Deselect all
-        bpy.ops.object.face_map_select()  # Select the faces of the faceMap       
+        bpy.ops.object.face_map_select()  # Select the faces of the faceMap
 
         # Assign the material on the selected faces
         bpy.ops.object.material_slot_assign()
-        
+
         bpy.ops.mesh.select_less()
         bpy.ops.mesh.select_less()
         Verts = [i.index for i in bmesh.from_edit_mesh(
@@ -179,24 +190,28 @@ class Ground():
             name=nameGroup)
         vertexGroup.add(Verts, 1.0, 'REPLACE')
 
-        Ground.createGradient(object, nameGroup, utility.MaterialUtils.createMaterial(
-            "snow", (1, 1, 1, 1)))
-
-    def createGradient(object: bpy.types.Object, name, material):
+    def createGradient(object: bpy.types.Object, name, otherName, material):
         bpy.ops.object.editmode_toggle()  # Go in edit mode
-        bpy.ops.mesh.select_all(action='DESELECT')  # Deselect all       
+        bpy.ops.mesh.select_all(action='DESELECT')  # Deselect all
 
         bpy.ops.object.material_slot_add()
         object.material_slots[object.material_slots.__len__(
         ) - 1].material = material
 
-       
+        face_map = object.face_maps.find(name)
+        object.face_maps.active_index = face_map
+        bpy.ops.object.face_map_select()
+
+        for map in object.face_maps:
+            if map.name != name and map.name != otherName:
+                print(map.name)
+                object.face_maps.active_index = map.index
+                bpy.ops.object.face_map_deselect()
+
         vertex_group = object.vertex_groups.find(name)
         object.vertex_groups.active_index = vertex_group
-        bpy.ops.object.vertex_group_select()
-        bpy.ops.mesh.select_more()
         bpy.ops.object.vertex_group_deselect()
-
+        #bpy.ops.mesh.select_more()
 
         bpy.ops.object.material_slot_assign()
         bpy.ops.mesh.select_all(action='DESELECT')  # Deselect all
