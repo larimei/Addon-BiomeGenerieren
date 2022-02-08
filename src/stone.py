@@ -5,7 +5,7 @@ import math
 import typing
 
 
-class Stone ():
+class Stone:
 
     WIDTH = random.uniform(2, 5)
     DEPTH = random.uniform(2, 5)
@@ -16,6 +16,9 @@ class Stone ():
         HEIGHT = abs(WIDTH + DEPTH - 4)
     else:
         HEIGHT = DEPTH / WIDTH + random.uniform(0, 2)
+
+    def __init__(self):
+        pass
 
     def createMaterial(self) -> bpy.types.Material:
 
@@ -57,7 +60,7 @@ class Stone ():
         )
         bpy.ops.object.shade_flat()
 
-        bpy.context.object.data.materials.append(self.createMaterial(self))
+        bpy.context.object.data.materials.append(self.createMaterial())
 
     # bpy.ops.mesh.primitive_uv_sphere_add(enter_editmode=False, align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
 

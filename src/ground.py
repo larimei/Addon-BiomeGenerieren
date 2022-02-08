@@ -31,7 +31,7 @@ class Ground():
     snow_faces = {}
     subdivision_levels: int
 
-    def initializeVariable(self, _ground_size, _edge_size, _biome_offset_y, _biome_offset_x, _biome_scale, _snow_border, weights, colors):
+    def __init__(self, _ground_size, _edge_size, _biome_offset_y, _biome_offset_x, _biome_scale, _snow_border, weights, colors):
         self.ground_size = _ground_size
         self.biome_offset_x = _biome_offset_x
         self.biome_offset_y = _biome_offset_y
@@ -73,56 +73,53 @@ class Ground():
             if biome == 0:
                 vert.z = pn.get_height(vert.x, vert.y) * \
                     3 + global_height - 1
-                self.addToGrass(
-                    self, linked_faces=ground_mesh.verts[i].link_faces)
+                self.addToGrass(linked_faces=ground_mesh.verts[i].link_faces)
             # forest
             elif biome == 1:
                 vert.z = global_height
-                self.addToForest(
-                    self, linked_faces=ground_mesh.verts[i].link_faces)
+                self.addToForest(linked_faces=ground_mesh.verts[i].link_faces)
 
             # desert
             elif biome == 2:
                 canyon_height = dn.get_height(vert.x, vert.y)
                 vert.z = math.pow(canyon_height, 2) * 3 + \
                     0.5 * global_height - 0.5
-                self.addToDesert(
-                    self, linked_faces=ground_mesh.verts[i].link_faces)
+                self.addToDesert(linked_faces=ground_mesh.verts[i].link_faces)
             # mountains
             else:
                 mtn_height = mn.get_height(vert.x, vert.y)
                 vert.z = global_height + \
                     math.pow(weight, 3) + math.pow(weight, 2) * mtn_height
                 if(vert.z >= (self.snowfall_border + random.uniform(0, 1))):
-                    self.addToSnow(self,
-                                   linked_faces=ground_mesh.verts[i].link_faces)
+                    self.addToSnow(
+                        linked_faces=ground_mesh.verts[i].link_faces)
                 else:
-                    self.addToMountain(self,
-                                       linked_faces=ground_mesh.verts[i].link_faces)
+                    self.addToMountain(
+                        linked_faces=ground_mesh.verts[i].link_faces)
 
         ground_mesh.to_mesh(ground.data)
         ground_mesh.free()
-        self.createFaceMask(ground, "grass", list(self.grass_faces.keys()), utility.MaterialUtils.createMaterial(
+        self.createFaceMask(object=ground, nameGroup="grass", indexes=list(self.grass_faces.keys()), material=utility.MaterialUtils.createMaterial(
             "grass", self.colors[0]))
-        self.createFaceMask(ground, "forest", list(self.forest_faces.keys()), utility.MaterialUtils.createMaterial(
+        self.createFaceMask(object=ground, nameGroup="forest", indexes=list(self.forest_faces.keys()), material=utility.MaterialUtils.createMaterial(
             "forest", self.colors[1]))
 
-        self.createFaceMask(ground, "desert", list(self.desert_faces.keys()), utility.MaterialUtils.createMaterial(
+        self.createFaceMask(object=ground, nameGroup="desert", indexes=list(self.desert_faces.keys()), material=utility.MaterialUtils.createMaterial(
             "desert", self.colors[2]))
-        self.createFaceMask(ground, "mountain", list(self.mountain_faces.keys()), utility.MaterialUtils.createMaterial(
+        self.createFaceMask(object=ground, nameGroup="mountain", indexes=list(self.mountain_faces.keys()), material=utility.MaterialUtils.createMaterial(
             "mountain", self.colors[3]))
-        self.createFaceMask(ground, "snow", list(self.snow_faces.keys()), utility.MaterialUtils.createMaterial(
+        self.createFaceMask(object=ground, nameGroup="snow", indexes=list(self.snow_faces.keys()), material=utility.MaterialUtils.createMaterial(
             "snow", self.colors[4]))
 
-        Ground.createGradient(ground, 'desert', 'forest', utility.MaterialUtils.createMaterial(
+        self.createGradient(object=ground, name='desert', otherName='forest', material=utility.MaterialUtils.createMaterial(
             "desert-forest", (0, 0, 0, 1)))
-        Ground.createGradient(ground, 'desert', 'grass', utility.MaterialUtils.createMaterial(
+        self.createGradient(object=ground, name='desert', otherName='grass', material=utility.MaterialUtils.createMaterial(
             "desert-grass", (0, 0, 0, 1)))
-        Ground.createGradient(ground, 'mountain', 'forest', utility.MaterialUtils.createMaterial(
+        self.createGradient(object=ground, name='mountain', otherName='forest', material=utility.MaterialUtils.createMaterial(
             "forest-mountain", (0, 0, 0, 1)))
-        Ground.createGradient(ground, 'forest', 'grass', utility.MaterialUtils.createMaterial(
+        self.createGradient(object=ground, name='forest', otherName='grass', material=utility.MaterialUtils.createMaterial(
             "forest-grass", (0, 0, 0, 1)))
-        Ground.createGradient(ground, 'mountain', 'grass', utility.MaterialUtils.createMaterial(
+        self.createGradient(object=ground, name='mountain', otherName='grass', material=utility.MaterialUtils.createMaterial(
             "grass-mountain", (0, 0, 0, 1)))
 
         # Add Decimate Modifier for Tris:
@@ -162,7 +159,7 @@ class Ground():
             self.snow_faces[current_face.index] = BiomeFace(
                 index=current_face.index, center=current_face.calc_center_median(), normal=current_face.normal)
 
-    def createFaceMask(object: bpy.types.Object, nameGroup, indexes, material):
+    def createFaceMask(self, object: bpy.types.Object, nameGroup, indexes, material):
         faceMap: bpy.types.FaceMap = object.face_maps.new(name=nameGroup)
 
         faceMap.add(indexes)
@@ -190,7 +187,7 @@ class Ground():
             name=nameGroup)
         vertexGroup.add(Verts, 1.0, 'REPLACE')
 
-    def createGradient(object: bpy.types.Object, name, otherName, material):
+    def createGradient(self, object: bpy.types.Object, name, otherName, material):
         bpy.ops.object.editmode_toggle()  # Go in edit mode
         bpy.ops.mesh.select_all(action='DESELECT')  # Deselect all
 
@@ -211,7 +208,7 @@ class Ground():
         vertex_group = object.vertex_groups.find(name)
         object.vertex_groups.active_index = vertex_group
         bpy.ops.object.vertex_group_deselect()
-        #bpy.ops.mesh.select_more()
+        # bpy.ops.mesh.select_more()
 
         bpy.ops.object.material_slot_assign()
         bpy.ops.mesh.select_all(action='DESELECT')  # Deselect all

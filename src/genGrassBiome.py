@@ -23,7 +23,7 @@ ROT_FALLOFF = 5
 
 class GenerateGrassBiome ():
 
-    def createGrassArray(self):
+    def createGrassArray():
         collection = bpy.data.collections.new("GrassCollection")
         bpy.context.scene.collection.children.link(collection)
         for grassIncrement in range(10):
@@ -89,7 +89,7 @@ class GenerateGrassBiome ():
                 "grassMaterial", (0, 0.4, 0.1, 1)))
             collection.objects.link(grass_object)
 
-    def createFlowersArray(self):
+    def createFlowersArray():
         collection = bpy.data.collections.new("FlowerCollection")
         bpy.context.scene.collection.children.link(collection)
         for flowerIncrement in range(3):
@@ -159,7 +159,7 @@ class GenerateGrassBiome ():
                 rndOffsetPos,  rndOffsetNeg), 0)
             collection.objects.link(flowerParent)
 
-    def genBushes(self):
+    def genBushes():
         collection = bpy.data.collections.new("BushCollection")
         bpy.context.scene.collection.children.link(collection)
         for bushesIncrement in range(2):

@@ -1,10 +1,11 @@
-from . import ground
-from . import genGrassBiome
-from . import generateTree
-from . import cactus
-from . import stone
-from . import utility
-from . import ui
+
+from src.ground import Ground
+from src.genGrassBiome import GenerateGrassBiome
+from src.generateTree import Tree
+from src.cactus import Cactus
+from src.stone import Stone
+from src.utility import CleanCollectionsUtils, ParticleUtils
+from src.ui import *
 import bpy
 
 
@@ -52,65 +53,67 @@ class GenerateGround(bpy.types.Operator):
             context.scene.desertWeight), float(context.scene.mountainWeight)]
         colors = [context.scene.grassColor, context.scene.forestColor,
                   context.scene.desertColor, context.scene.mountainColor, context.scene.snowColor]
-        ground.Ground.initializeVariable(ground.Ground,
-                                         int(context.scene.size), float(context.scene.groundEdgeSize), int(context.scene.offsetX), int(context.scene.offsetY), float(context.scene.biomeScale), float(context.scene.snowBorder), weights=weights, colors=colors)
-        ground.Ground.generate_ground(ground.Ground, context)
+        ground = Ground(int(context.scene.size), float(context.scene.groundEdgeSize), int(context.scene.offsetX), int(
+            context.scene.offsetY), float(context.scene.biomeScale), float(context.scene.snowBorder), weights=weights, colors=colors)
+
+        ground.generate_ground(context)
         # grass--------------------------
-        GenerateBiomeContent().generateGrassBiome(int(context.scene.grassCount),
-                                                  int(context.scene.flowerCount), int(context.scene.bushCount))
+        GenerateBiomeContent.generateGrassBiome(int(context.scene.grassCount),
+                                                int(context.scene.flowerCount), int(context.scene.bushCount))
         # forest--------------------------
-        GenerateBiomeContent().generateForestBiome(
+        GenerateBiomeContent.generateForestBiome(
             int(context.scene.treeCount), int(context.scene.pineCount), int(context.scene.branchCount))
 
         # desert--------------------------
-        GenerateBiomeContent().generateDesertBiome(
+        GenerateBiomeContent.generateDesertBiome(
             int(context.scene.cactusCount), int(context.scene.stoneCount))
 
         bpy.context.space_data.shading.type = 'MATERIAL'
 
-        utility.CleanCollectionsUtils.cleanSystem()
+        CleanCollectionsUtils.cleanSystem()
 
         return {'FINISHED'}
 
 
 class GenerateBiomeContent():
 
-    def generateGrassBiome(GenerateGrass, grassCount, flowerCount, bushCount):
-        genGrassBiome.GenerateGrassBiome.createGrassArray(genGrassBiome)
-        genGrassBiome.GenerateGrassBiome.createFlowersArray(genGrassBiome)
-        genGrassBiome.GenerateGrassBiome.genBushes(genGrassBiome)
-        utility.ParticleUtils.createParticleSystem(
+    def generateGrassBiome(grassCount, flowerCount, bushCount):
+        GenerateGrassBiome.createGrassArray()
+        GenerateGrassBiome.createFlowersArray()
+        GenerateGrassBiome.genBushes()
+        ParticleUtils.createParticleSystem(
             bpy.data.objects["Plane"], "grassParticles", "grass", "GrassCollection", grassCount, 1.0, 0.01, 1)
-        utility.ParticleUtils.createParticleSystem(
+        ParticleUtils.createParticleSystem(
             bpy.data.objects["Plane"], "flowerParticles", "grass", "FlowerCollection", flowerCount, 1.0, 0.01, 1)
-        utility.ParticleUtils.createParticleSystem(
+        ParticleUtils.createParticleSystem(
             bpy.data.objects["Plane"], "bushParticles", "grass", "BushCollection", bushCount, 1.0, 0.25, 1)
 
-    def generateForestBiome(GenerateForest, treeCount, pineCount, branchCount):
-        generateTree.Tree.generateTree(0, 0, 0)
-        utility.ParticleUtils.createParticleSystem(
+    def generateForestBiome(treeCount, pineCount, branchCount):
+        Tree.generateTree(0, 0, 0)
+        ParticleUtils.createParticleSystem(
             bpy.data.objects["Plane"], "treeParticles", "forest", "TreeCollection", treeCount, 1.0, 0.03, 1)
 
-        generateTree.Tree.generatePineTree(0, 0, 0.7)
-        utility.ParticleUtils.createParticleSystem(
+        Tree.generatePineTree(0, 0, 0.7)
+        ParticleUtils.createParticleSystem(
             bpy.data.objects["Plane"], "pineParticles", "forest", "PineCollection", pineCount, 1.0, 0.06, 2)
-        
-        generateTree.Tree.generateTreeWithBranches()
-        utility.ParticleUtils.createParticleSystem(
+
+        Tree.generateTreeWithBranches()
+        ParticleUtils.createParticleSystem(
             bpy.data.objects["Plane"], "branchParticles", "forest", "TreeWithBranchesCollection", branchCount, 1.0, 0.06, 3)
 
-    def generateDesertBiome(GenerateGrass, cactusCount, stoneCount):
+    def generateDesertBiome(cactusCount, stoneCount):
         # generate Desert content here
-        cactus.Cactus.generateCactus()
-        utility.ParticleUtils.createParticleSystem(
+        Cactus.generateCactus()
+        ParticleUtils.createParticleSystem(
             bpy.data.objects["Plane"], "cactusParticles", "desert", "CactusCollection", cactusCount, 1.0, 0.03, 1)
 
-        stone.Stone.generateStone(stone.Stone)
-        utility.ParticleUtils.createParticleSystem(
+        stone = Stone()
+        stone.generateStone()
+        ParticleUtils.createParticleSystem(
             bpy.data.objects["Plane"], "stoneParticles", "desert", "StoneCollection", stoneCount, 1.0, 0.025, 1)
 
 
-classes = [ui.MainPanel, ui.DistributionPanel, ui.DesertPanel, ui.ForestPanel, ui.GrassPanel, ui.MountainPanel,
+classes = [MainPanel, DistributionPanel, DesertPanel, ForestPanel, GrassPanel, MountainPanel,
            GenerateGround, DeleteAll]
 
 

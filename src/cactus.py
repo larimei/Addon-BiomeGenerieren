@@ -11,7 +11,7 @@ MAX_SHIFT = 1.5
 HEIGHT = 1.5
 
 
-class Cactus(bpy.types.Operator):
+class Cactus:
     def generateSpikes(object):
 
         PARTICLES = random.uniform(60, 120)
