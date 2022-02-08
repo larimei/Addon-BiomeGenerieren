@@ -50,8 +50,10 @@ class GenerateGround(bpy.types.Operator):
         # ground--------------------------
         weights = [float(context.scene.grassWeight), float(context.scene.forestWeight), float(
             context.scene.desertWeight), float(context.scene.mountainWeight)]
+        colors = [context.scene.grassColor, context.scene.forestColor,
+                  context.scene.desertColor, context.scene.mountainColor, context.scene.snowColor]
         ground.Ground.initializeVariable(ground.Ground,
-                                         int(context.scene.size), int(context.scene.offsetX), int(context.scene.offsetY), float(context.scene.biomeScale), float(context.scene.snowBorder), weights)
+                                         int(context.scene.size), float(context.scene.groundEdgeSize), int(context.scene.offsetX), int(context.scene.offsetY), float(context.scene.biomeScale), float(context.scene.snowBorder), weights=weights, colors=colors)
         ground.Ground.generate_ground(ground.Ground, context)
         # grass--------------------------
         GenerateBiomeContent().generateGrassBiome(int(context.scene.grassCount),
@@ -95,8 +97,6 @@ class GenerateBiomeContent():
             bpy.data.objects["Plane"], "pineParticles", "forest", "PineCollection", pineCount, 1.0, 0.06, 2)
 
     def generateDesertBiome(GenerateGrass, cactusCount, stoneCount):
-        for face in ground.Ground.desert_faces.values():
-            print(face)
         # generate Desert content here
         cactus.Cactus.generateCactus()
         utility.ParticleUtils.createParticleSystem(
@@ -108,8 +108,7 @@ class GenerateBiomeContent():
 
     def generateMountainBiome(GenerateGrass):
         # generate Mountain content here
-        for face in ground.Ground.mountain_faces.values():
-            print(face)
+        pass
 
 
 def main(context):
@@ -139,6 +138,12 @@ def register():
     bpy.types.Scene.biomeScale = bpy.props.FloatProperty(
         name="Biome Scale",
         default=20.0
+    )
+    bpy.types.Scene.groundEdgeSize = bpy.props.FloatProperty(
+        name="Ground Edge Size",
+        default=0.5,
+        min=0.1,
+        step=10
     )
     bpy.types.Scene.cactusCount = bpy.props.IntProperty(
         name="Cactus Count",
@@ -212,6 +217,47 @@ def register():
         step=10
     )
 
+    bpy.types.Scene.grassColor = bpy.props.FloatVectorProperty(
+        name="Grass Color",
+        subtype="COLOR",
+        default=(0.09, 0.9, 0.1, 1.000000),
+        size=4,
+        min=0.0,
+        max=1.0,
+    )
+    bpy.types.Scene.forestColor = bpy.props.FloatVectorProperty(
+        name="Grass Color",
+        subtype="COLOR",
+        default=(0.038, 0.7, 0.05, 1.000000),
+        size=4,
+        min=0.0,
+        max=1.0,
+    )
+    bpy.types.Scene.desertColor = bpy.props.FloatVectorProperty(
+        name="Grass Color",
+        subtype="COLOR",
+        default=(0.77, 0.65, 0.39, 1.000000),
+        size=4,
+        min=0.0,
+        max=1.0,
+    )
+    bpy.types.Scene.mountainColor = bpy.props.FloatVectorProperty(
+        name="Grass Color",
+        subtype="COLOR",
+        default=(0.4, 0.4, 0.4, 1.000000),
+        size=4,
+        min=0.0,
+        max=1.0,
+    )
+    bpy.types.Scene.snowColor = bpy.props.FloatVectorProperty(
+        name="Grass Color",
+        subtype="COLOR",
+        default=(0.95, 0.95, 0.95, 1.000000),
+        size=4,
+        min=0.0,
+        max=1.0,
+    )
+
 
 def unregister():
     for cls in classes:
@@ -231,6 +277,12 @@ def unregister():
     del bpy.types.Scene.forestWeight
     del bpy.types.Scene.desertWeight
     del bpy.types.Scene.mountainWeight
+    del bpy.types.Scene.grassColor
+    del bpy.types.Scene.forestColor
+    del bpy.types.Scene.desertColor
+    del bpy.types.Scene.mountainColor
+    del bpy.types.Scene.snowColor
+    del bpy.types.Scene.groundEdgeSize
 
 
 if __name__ == "__main__":
