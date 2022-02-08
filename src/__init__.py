@@ -1,6 +1,3 @@
-
-import math
-import random
 from . import ground
 from . import genGrassBiome
 from . import generateTree
@@ -60,10 +57,12 @@ class GenerateGround(bpy.types.Operator):
         GenerateBiomeContent().generateGrassBiome(int(context.scene.grassCount),
                                                   int(context.scene.flowerCount), int(context.scene.bushCount))
         # forest--------------------------
-        GenerateBiomeContent().generateForestBiome(int(context.scene.treeCount), int(context.scene.pineCount))
+        GenerateBiomeContent().generateForestBiome(
+            int(context.scene.treeCount), int(context.scene.pineCount))
 
         # desert--------------------------
-        GenerateBiomeContent().generateDesertBiome(int(context.scene.cactusCount), int(context.scene.stoneCount))
+        GenerateBiomeContent().generateDesertBiome(
+            int(context.scene.cactusCount), int(context.scene.stoneCount))
 
         # mountain--------------------------
         # GenerateBiomeContent().generateMountainBiome()
@@ -99,14 +98,13 @@ class GenerateBiomeContent():
         for face in ground.Ground.desert_faces.values():
             print(face)
         # generate Desert content here
-        cactus.Cactus.generateCactus(0, 0, 0)
+        cactus.Cactus.generateCactus()
         utility.ParticleUtils.createParticleSystem(
             bpy.data.objects["Plane"], "cactusParticles", "desert", "CactusCollection", cactusCount, 1.0, 0.03, 1)
 
-        stone.stone.generateStone(0, 0, 0)
+        stone.Stone.generateStone(stone.Stone)
         utility.ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "stoneParticles", "desert", "StoneCollection", stoneCount, 1.0, 0.5, 1)
-
+            bpy.data.objects["Plane"], "stoneParticles", "desert", "StoneCollection", stoneCount, 1.0, 0.025, 1)
 
     def generateMountainBiome(GenerateGrass):
         # generate Mountain content here
@@ -145,6 +143,10 @@ def register():
     bpy.types.Scene.cactusCount = bpy.props.IntProperty(
         name="Cactus Count",
         default=50
+    )
+    bpy.types.Scene.stoneCount = bpy.props.IntProperty(
+        name="Stone Count",
+        default=10
     )
     bpy.types.Scene.grassCount = bpy.props.IntProperty(
         name="Grass Count",
@@ -219,6 +221,7 @@ def unregister():
     del bpy.types.Scene.offsetY
     del bpy.types.Scene.biomeScale
     del bpy.types.Scene.cactusCount
+    del bpy.types.Scene.stoneCount
     del bpy.types.Scene.grassCount
     del bpy.types.Scene.flowerCount
     del bpy.types.Scene.bushCount

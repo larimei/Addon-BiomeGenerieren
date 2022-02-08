@@ -64,6 +64,7 @@ class DesertPanel(bpy.types.Panel):
         col = layout.column()
         col.use_property_split = True
         col.prop(context.scene, "cactusCount", text="Cactus Count")
+        col.prop(context.scene, "stoneCount", text="Stone Count")
 
 
 class GrassPanel(bpy.types.Panel):

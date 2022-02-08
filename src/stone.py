@@ -4,6 +4,7 @@ import mathutils
 import math
 import typing
 
+
 class Stone ():
 
     WIDTH = random.uniform(2, 5)
@@ -15,24 +16,26 @@ class Stone ():
         HEIGHT = abs(WIDTH + DEPTH - 4)
     else:
         HEIGHT = DEPTH / WIDTH + random.uniform(0, 2)
-        
+
     def createMaterial(self) -> bpy.types.Material:
-        
+
         GREYTONE = random.uniform(0.25, 0.75)
 
-        stoneMaterial: bpy.types.Material = bpy.data.materials.new("Stone Material")
+        stoneMaterial: bpy.types.Material = bpy.data.materials.new(
+            "Stone Material")
         stoneMaterial.use_nodes = True
 
         stoneNodes: typing.List[bpy.types.Node] = stoneMaterial.node_tree.nodes
-        stoneNodes["Principled BSDF"].inputs[0].default_value = (GREYTONE, GREYTONE, GREYTONE, 1)
+        stoneNodes["Principled BSDF"].inputs[0].default_value = (
+            GREYTONE, GREYTONE, GREYTONE, 1)
         print(GREYTONE)
 
      #   noiseTex: bpy.types.Node = stoneNodes.new("ShaderNodeTexNoise")
-      #  voronoiTex: bpy.types.Node = stoneNodes.new("ShaderNodeTexVoronoi")    
+      #  voronoiTex: bpy.types.Node = stoneNodes.new("ShaderNodeTexVoronoi")
 
     #    noiseTex.inputs[2].default_value = 15.000
   #      noiseTex.inputs[3].default_value = 0.592
-   #     
+   #
  #       voronoiTex.inputs[1].default_value = 0
 #        voronoiTex.inputs[2].default_value = 1.000
 
@@ -44,6 +47,7 @@ class Stone ():
     def generateStone(self):
         collection = bpy.data.collections.new("StoneCollection")
         bpy.context.scene.collection.children.link(collection)
+
         # stoneMesh = bpy.ops.meshes.new("stone")  # add the new mesh
         #    obj = bpy.ops.objects.new(stoneMesh.name, stoneMesh)
 
@@ -54,9 +58,8 @@ class Stone ():
         )
         bpy.ops.object.shade_flat()
 
-        bpy.context.object.data.materials.append(self.createMaterial())
+        bpy.context.object.data.materials.append(self.createMaterial(self))
 
-        
     # bpy.ops.mesh.primitive_uv_sphere_add(enter_editmode=False, align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
 
     #frequency = random.uniform(5, 25)
@@ -73,9 +76,5 @@ class Stone ():
             # vert.co.z += amplitude * math.sin(frequency * vert.co.y)
             # vert.co.y += amplitude * math.sin(frequency * vert.co.x)
 
-
         currentmesh.update()
-
-s = Stone()
-s.generateStone()
-
+        collection.objects.link(bpy.context.object)
