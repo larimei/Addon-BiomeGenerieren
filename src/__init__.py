@@ -12,7 +12,7 @@ bl_info = {
     "name": "Generate Biomes",
     "author": "Valentin, Fabian, Viktor, Lara",
     "version": (1, 0),
-    "blender": (2, 80, 0),
+    "blender": (2, 90, 0),
     "location": "View3D > Toolbar > Generate Biomes",
     "description": "Adds different biomes, where you can set different parameters",
     "warning": "",
@@ -226,7 +226,7 @@ def register():
         max=1.0,
     )
     bpy.types.Scene.forestColor = bpy.props.FloatVectorProperty(
-        name="Grass Color",
+        name="Forest Color",
         subtype="COLOR",
         default=(0.038, 0.7, 0.05, 1.000000),
         size=4,
@@ -234,7 +234,7 @@ def register():
         max=1.0,
     )
     bpy.types.Scene.desertColor = bpy.props.FloatVectorProperty(
-        name="Grass Color",
+        name="Desert Color",
         subtype="COLOR",
         default=(0.77, 0.65, 0.39, 1.000000),
         size=4,
@@ -242,7 +242,7 @@ def register():
         max=1.0,
     )
     bpy.types.Scene.mountainColor = bpy.props.FloatVectorProperty(
-        name="Grass Color",
+        name="Mountain Color",
         subtype="COLOR",
         default=(0.4, 0.4, 0.4, 1.000000),
         size=4,
@@ -250,7 +250,7 @@ def register():
         max=1.0,
     )
     bpy.types.Scene.snowColor = bpy.props.FloatVectorProperty(
-        name="Grass Color",
+        name="Snow Color",
         subtype="COLOR",
         default=(0.95, 0.95, 0.95, 1.000000),
         size=4,
