@@ -24,11 +24,6 @@ class Ground():
     snowfall_border: float
     colors = []
     # others
-    grass_faces = {}
-    forest_faces = {}
-    desert_faces = {}
-    mountain_faces = {}
-    snow_faces = {}
     subdivision_levels: int
 
     def __init__(self, _ground_size, _edge_size, _biome_offset_y, _biome_offset_x, _biome_scale, _snow_border, weights, colors):
@@ -43,6 +38,11 @@ class Ground():
         self.mountain_weight = weights[3]
         self.snowfall_border = _snow_border
         self.colors = colors
+        self.grass_faces = {}
+        self.forest_faces = {}
+        self.desert_faces = {}
+        self.mountain_faces = {}
+        self.snow_faces = {}
 
     def generate_ground(self, context):
         bpy.ops.mesh.primitive_plane_add(
