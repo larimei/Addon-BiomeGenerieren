@@ -180,11 +180,12 @@ class GenerateGrassBiome ():
 
             bm.verts[0].co += bm.verts[0].normal * -5
             bpy.ops.object.mode_set(mode='OBJECT')
-            if(bushesIncrement % 1 == 0):
+            if(bushesIncrement % 2 == 0):
                 bpy.ops.object.duplicate()
                 duplicatedBush: bpy.types.Object = bpy.context.active_object
                 duplicatedBush.location = (10, 10, -1)
                 duplicatedBush.scale = (0.75, 0.75, 0.75)
+                collection.objects.link(duplicatedBush)
                 duplicatedBush.parent = bushObject
                 bpy.ops.object.duplicate()
                 duplicatedBush: bpy.types.Object = bpy.context.active_object
@@ -206,6 +207,7 @@ class GenerateGrassBiome ():
                 duplicatedBush: bpy.types.Object = bpy.context.active_object
                 duplicatedBush.location = (10, 6, -4)
                 duplicatedBush.scale = (0.35, 0.35, 0.35)
+                collection.objects.link(duplicatedBush)
                 duplicatedBush.parent = bushObject
                 bpy.ops.object.duplicate()
                 duplicatedBush: bpy.types.Object = bpy.context.active_object
@@ -213,8 +215,7 @@ class GenerateGrassBiome ():
                 duplicatedBush.scale = (0.45, 0.45, 0.45)
                 duplicatedBush.parent = bushObject
             bushObject.rotation_euler = (0, 0, random.randrange(0, 360))
-            bushObject.location = (0,
-                                   0, 0)
+            bushObject.location = (0, 0, 0)
             rndScale = random.uniform(0.045, 0.085)
             bushObject.scale = (rndScale, rndScale, rndScale)
             collection.objects.link(bushObject)
