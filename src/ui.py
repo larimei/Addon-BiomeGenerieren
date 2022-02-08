@@ -18,6 +18,8 @@ class MainPanel(bpy.types.Panel):
         col.use_property_split = True
         col.prop(context.scene, "size", text="Ground Mesh Size")
         col.separator()
+        col.prop(context.scene, "groundEdgeSize", text="Ground Edge Size")
+        col.separator()
         col.label(text="Offset Vector")
         col.separator()
         offset = col.box()
@@ -29,7 +31,7 @@ class MainPanel(bpy.types.Panel):
         row2 = layout.row()
         # insert operator
         row2.scale_x = 7
-        row2.scale_y = 3
+        row2.scale_y = 2
         row2.operator("gen.landscape", text="Generate Scene")
         # insert operator
         row2.operator("delete.all", text="Reset Scene")
@@ -65,6 +67,7 @@ class DesertPanel(bpy.types.Panel):
         col.use_property_split = True
         col.prop(context.scene, "cactusCount", text="Cactus Count")
         col.prop(context.scene, "stoneCount", text="Stone Count")
+        col.prop(context.scene, "desertColor", text="Desert Color")
 
 
 class GrassPanel(bpy.types.Panel):
@@ -81,6 +84,7 @@ class GrassPanel(bpy.types.Panel):
         col.prop(context.scene, "grassCount", text="Grass Count")
         col.prop(context.scene, "flowerCount", text="Flower Count")
         col.prop(context.scene, "bushCount", text="Bush Count")
+        col.prop(context.scene, "grassColor", text="Grass Surface Color")
 
 
 class ForestPanel(bpy.types.Panel):
@@ -97,6 +101,7 @@ class ForestPanel(bpy.types.Panel):
         col.prop(context.scene, "treeCount", text="Tree Count")
         col.prop(context.scene, "pineCount", text="Pine Count")
         col.prop(context.scene, "branchCount", text="Tree With Branches Count")
+        col.prop(context.scene, "forestColor", text="Forest Color")
 
 
 class MountainPanel(bpy.types.Panel):
@@ -111,3 +116,5 @@ class MountainPanel(bpy.types.Panel):
         col = layout.column()
         col.use_property_split = True
         col.prop(context.scene, "snowBorder", text="Snow Border Height")
+        col.prop(context.scene, "snowColor", text="Snow Color")
+        col.prop(context.scene, "mountainColor", text="Mountain Color")

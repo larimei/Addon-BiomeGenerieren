@@ -14,38 +14,35 @@ class Ground():
     ground_size: int  # 80
     biome_offset_x: int  # 10
     biome_offset_y: int  # 10
+
     # float
-    face_edge_size = 0.5
     biome_scale: float
     grass_weight: float
     forest_weight: float
     desert_weight: float
     mountain_weight: float
     snowfall_border: float
-
-    # constants that are effected by input
-    SUBDIVISION_LEVELS: float
-    VERTCOUNT_EDGE: int
-    BIOME_AMOUNT = 4
+    colors = []
     # others
     grass_faces = {}
     forest_faces = {}
     desert_faces = {}
     mountain_faces = {}
     snow_faces = {}
+    subdivision_levels: int
 
-    def initializeVariable(self, _groundSize, _biome_offset_y, _biome_offset_x, _biome_scale, _snow_border, weights):
-        self.ground_size = _groundSize
+    def initializeVariable(self, _ground_size, _edge_size, _biome_offset_y, _biome_offset_x, _biome_scale, _snow_border, weights, colors):
+        self.ground_size = _ground_size
         self.biome_offset_x = _biome_offset_x
         self.biome_offset_y = _biome_offset_y
         self.biome_scale = _biome_scale
-        self.SUBDIVISION_LEVELS = self.ground_size / self.face_edge_size - 1
-        self.VERTCOUNT_EDGE = round(self.SUBDIVISION_LEVELS + 2)
+        self.subdivision_levels = int(self.ground_size / _edge_size - 1)
         self.grass_weight = weights[0]
         self.forest_weight = weights[1]
         self.desert_weight = weights[2]
         self.mountain_weight = weights[3]
         self.snowfall_border = _snow_border
+        self.colors = colors
 
     def generate_ground(self, context):
         bpy.ops.mesh.primitive_plane_add(
@@ -53,7 +50,7 @@ class Ground():
 
         ground = bpy.context.object
         bpy.ops.object.editmode_toggle()
-        bpy.ops.mesh.subdivide(number_cuts=self.SUBDIVISION_LEVELS)
+        bpy.ops.mesh.subdivide(number_cuts=self.subdivision_levels)
         bpy.ops.object.editmode_toggle()
 
         ground_mesh = bmesh.new()
@@ -105,16 +102,17 @@ class Ground():
 
         ground_mesh.to_mesh(ground.data)
         ground_mesh.free()
-        self.createFaceMask(ground, "forest", list(self.forest_faces.keys()), utility.MaterialUtils.createMaterial(
-            "forest", (0.038, 0.7, 0.05, 1.000000)))
         self.createFaceMask(ground, "grass", list(self.grass_faces.keys()), utility.MaterialUtils.createMaterial(
-            "grass", (0.09, 0.9, 0.1, 1.000000)))
+            "grass", self.colors[0]))
+        self.createFaceMask(ground, "forest", list(self.forest_faces.keys()), utility.MaterialUtils.createMaterial(
+            "forest", self.colors[1]))
+
         self.createFaceMask(ground, "desert", list(self.desert_faces.keys()), utility.MaterialUtils.createMaterial(
-            "desert", (0.77, 0.65, 0.39, 1.000000)))
+            "desert", self.colors[2]))
         self.createFaceMask(ground, "mountain", list(self.mountain_faces.keys()), utility.MaterialUtils.createMaterial(
-            "mountain", (0.4, 0.4, 0.4, 1.000000)))
+            "mountain", self.colors[3]))
         self.createFaceMask(ground, "snow", list(self.snow_faces.keys()), utility.MaterialUtils.createMaterial(
-            "snow", (0.95, 0.95, 0.95, 1.000000)))
+            "snow", self.colors[4]))
 
         # Add Decimate Modifier for Tris:
         bpy.ops.object.select_pattern(
