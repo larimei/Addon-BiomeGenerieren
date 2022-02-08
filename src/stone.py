@@ -4,7 +4,7 @@ import mathutils
 import math
 import typing
 
-class stone ():
+class Stone ():
 
     WIDTH = random.uniform(2, 5)
     DEPTH = random.uniform(2, 5)
@@ -42,7 +42,8 @@ class stone ():
         return stoneMaterial
 
     def generateStone(self):
-
+        collection = bpy.data.collections.new("StoneCollection")
+        bpy.context.scene.collection.children.link(collection)
         # stoneMesh = bpy.ops.meshes.new("stone")  # add the new mesh
         #    obj = bpy.ops.objects.new(stoneMesh.name, stoneMesh)
 
@@ -75,6 +76,6 @@ class stone ():
 
         currentmesh.update()
 
-s = stone()
+s = Stone()
 s.generateStone()
 

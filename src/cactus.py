@@ -41,7 +41,8 @@ def generateBranches(edges, verts, vert, branch, lastIndex):
         edges.append(edge)
 
 def generateCactus():
-
+    collection = bpy.data.collections.new("CactusCollection")
+    bpy.context.scene.collection.children.link(collection)
     mesh = bpy.data.meshes.new("cactus")  # add the new mesh
     obj = bpy.data.objects.new(mesh.name, mesh)
     col = bpy.data.collections.get("Collection")
@@ -138,8 +139,8 @@ def createMaterial() -> bpy.types.Material:
     cactusNodes["Principled BSDF"].inputs[0].default_value = (RED, GREEN, 0.0, 1)
     return cactusMaterial
     
-class CactusBranches(bpy.types.Operator):
-    bl_idname = "object.generate_cactus_branches"
+class Cactus(bpy.types.Operator):
+    bl_idname = "object.generate_cactus"
     bl_label = "Generate a Cactus"
 
     @classmethod

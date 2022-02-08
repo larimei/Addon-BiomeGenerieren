@@ -4,6 +4,8 @@ import random
 from . import ground
 from . import genGrassBiome
 from . import generateTree
+from . import cactus
+from . import stone
 from . import utility
 from . import ui
 import bpy
@@ -58,11 +60,10 @@ class GenerateGround(bpy.types.Operator):
         GenerateBiomeContent().generateGrassBiome(int(context.scene.grassCount),
                                                   int(context.scene.flowerCount), int(context.scene.bushCount))
         # forest--------------------------
-        GenerateBiomeContent().generateForestBiome(
-            int(context.scene.treeCount), int(context.scene.pineCount))
+        GenerateBiomeContent().generateForestBiome(int(context.scene.treeCount), int(context.scene.pineCount))
 
         # desert--------------------------
-        # GenerateBiomeContent().generateDesertBiome()
+        GenerateBiomeContent().generateDesertBiome(int(context.scene.cactusCount), int(context.scene.stoneCount))
 
         # mountain--------------------------
         # GenerateBiomeContent().generateMountainBiome()
@@ -94,10 +95,18 @@ class GenerateBiomeContent():
         utility.ParticleUtils.createParticleSystem(
             bpy.data.objects["Plane"], "pineParticles", "forest", "PineCollection", pineCount, 1.0, 0.06, 2)
 
-    def generateDesertBiome(GenerateGrass):
-        # generate Desert content here
+    def generateDesertBiome(GenerateGrass, cactusCount, stoneCount):
         for face in ground.Ground.desert_faces.values():
             print(face)
+        # generate Desert content here
+        cactus.Cactus.generateCactus(0, 0, 0)
+        utility.ParticleUtils.createParticleSystem(
+            bpy.data.objects["Plane"], "cactusParticles", "desert", "CactusCollection", cactusCount, 1.0, 0.03, 1)
+
+        stone.stone.generateStone(0, 0, 0)
+        utility.ParticleUtils.createParticleSystem(
+            bpy.data.objects["Plane"], "stoneParticles", "desert", "StoneCollection", stoneCount, 1.0, 0.5, 1)
+
 
     def generateMountainBiome(GenerateGrass):
         # generate Mountain content here
