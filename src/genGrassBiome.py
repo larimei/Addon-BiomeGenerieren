@@ -92,7 +92,7 @@ class GenerateGrassBiome ():
     def createFlowersArray():
         collection = bpy.data.collections.new("FlowerCollection")
         bpy.context.scene.collection.children.link(collection)
-        for flowerIncrement in range(3):
+        for flowerIncrement in range(5):
             bpy.ops.mesh.primitive_cube_add(
                 location=(0, 0, 6), scale=(0.5, 0.5, 0.15))
 
@@ -119,9 +119,6 @@ class GenerateGrassBiome ():
             paddelsContainer = bpy.data.objects.new("paddelsContainer", None)
             collection.objects.link(paddelsContainer)
             flowerParent = bpy.data.objects.new("flowerParent", None)
-
-            rndScale = random.uniform(0.5, 1.25)
-            flowerParent.scale = (rndScale, rndScale, rndScale)
             for i in range(num):
                 y = math.sin(i/num * math.pi * 2) * rad
                 x = math.cos(i / num * math.pi*2) * rad
@@ -160,11 +157,13 @@ class GenerateGrassBiome ():
             collection.objects.link(flowerParent)
 
     def genBushes():
-        collection = bpy.data.collections.new("BushCollection")
-        bpy.context.scene.collection.children.link(collection)
-        for bushesIncrement in range(2):
+
+        for bushesIncrement in range(3):
+            collection = bpy.data.collections.new(
+                "BushCollection" + str(bushesIncrement))
+            bpy.context.scene.collection.children.link(collection)
             bpy.ops.mesh.primitive_ico_sphere_add(
-                subdivisions=1, enter_editmode=True, location=(0, 0, 5), scale=(10, 10, 10))
+                subdivisions=1, enter_editmode=True, location=(0, 0, 0), scale=(10, 10, 10))
             bpy.context.active_object.name = "bush" + str(bushesIncrement)
 
             bushData = bpy.context.active_object.data
@@ -180,7 +179,7 @@ class GenerateGrassBiome ():
 
             bm.verts[0].co += bm.verts[0].normal * -5
             bpy.ops.object.mode_set(mode='OBJECT')
-            if(bushesIncrement % 2 == 0):
+            if(bushesIncrement == 0):
                 bpy.ops.object.duplicate()
                 duplicatedBush: bpy.types.Object = bpy.context.active_object
                 duplicatedBush.location = (10, 10, -1)
@@ -202,7 +201,7 @@ class GenerateGrassBiome ():
                 duplicatedBush.location = (-8,  9, -3)
                 duplicatedBush.scale = (0.5, 0.5, 0.5)
                 duplicatedBush.parent = bushObject
-            else:
+            if(bushesIncrement == 1):
                 bpy.ops.object.duplicate()
                 duplicatedBush: bpy.types.Object = bpy.context.active_object
                 duplicatedBush.location = (10, 6, -4)
@@ -214,8 +213,6 @@ class GenerateGrassBiome ():
                 duplicatedBush.location = (-8, -9, -3.35)
                 duplicatedBush.scale = (0.45, 0.45, 0.45)
                 duplicatedBush.parent = bushObject
+
             bushObject.rotation_euler = (0, 0, random.randrange(0, 360))
-            bushObject.location = (0, 0, 0)
-            rndScale = random.uniform(0.045, 0.085)
-            bushObject.scale = (rndScale, rndScale, rndScale)
             collection.objects.link(bushObject)

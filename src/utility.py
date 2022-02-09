@@ -38,7 +38,7 @@ class ParticleUtils:
         particleSystem.settings.use_advanced_hair = True
         particleSystem.settings.rotation_mode = 'NONE'
         particleSystem.settings.use_even_distribution = False
-        particleSystem.child_seed = seed
+        particleSystem.seed = seed
         particleSystem.vertex_group_density = vertexGroup
 
 

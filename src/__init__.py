@@ -1,4 +1,5 @@
 
+import random
 from src.ground import Ground
 from src.genGrassBiome import GenerateGrassBiome
 from src.generateTree import Tree
@@ -82,39 +83,47 @@ class GenerateBiomeContent():
         GenerateGrassBiome.createFlowersArray()
         GenerateGrassBiome.genBushes()
         ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "grassParticles", "grass", "GrassCollection", grassCount, 1.0, 0.01, 1)
+            bpy.data.objects["Plane"], "grassParticles", "grass", "GrassCollection", grassCount, 0, random.uniform(0.0075, 0.0085), random.randint(0, 10))
         ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "flowerParticles", "grass", "FlowerCollection", flowerCount, 1.0, 0.01, 1)
+            bpy.data.objects["Plane"], "flowerParticles", "grass", "FlowerCollection", flowerCount, 1.0, random.uniform(0.009, 0.0125), random.randint(0, 5))
         ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "bushParticles", "grass", "BushCollection", bushCount, 1.0, 0.25, 1)
+            bpy.data.objects["Plane"], "bushParticles", "grass", "BushCollection0", int(bushCount/3.0), 1.0, random.uniform(0.015, 0.025), random.randint(0, 2))
+        ParticleUtils.createParticleSystem(
+            bpy.data.objects["Plane"], "bushParticles.001", "grass", "BushCollection1", int(bushCount/3.0), 1.0, random.uniform(0.015, 0.025), random.randint(2, 4))
+        ParticleUtils.createParticleSystem(
+            bpy.data.objects["Plane"], "bushParticles.002", "grass", "BushCollection2", int(bushCount/3.0), 1.0, random.uniform(0.015, 0.025), random.randint(4, 6))
 
     def generateForestBiome(treeCount, pineCount, branchCount):
         Tree.generateTree(0, 0, 0)
         ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "treeParticles", "forest", "TreeCollection", treeCount, 1.0, 0.03, 1)
+            bpy.data.objects["Plane"], "treeParticles", "forest", "TreeCollection", treeCount, 0, random.uniform(0.025, 0.03), random.randint(0, 2))
 
         Tree.generatePineTree(0, 0, 0.7)
         ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "pineParticles", "forest", "PineCollection", pineCount, 1.0, 0.06, 2)
+            bpy.data.objects["Plane"], "pineParticles", "forest", "PineCollection", pineCount, 0, random.uniform(0.06, 0.07), random.randint(2, 4))
 
         Tree.generateTreeWithBranches()
         ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "branchParticles", "forest", "TreeWithBranchesCollection", branchCount, 1.0, 0.06, 3)
+            bpy.data.objects["Plane"], "branchParticles", "forest", "TreeWithBranchesCollection", branchCount, 0, random.uniform(0.06, 0.07), random.randint(4, 6))
 
     def generateDesertBiome(cactusCount, stoneCount):
         # generate Desert content here
         Cactus.generateCactus()
         ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "cactusParticles", "desert", "CactusCollection", cactusCount, 1.0, 0.03, 1)
+            bpy.data.objects["Plane"], "cactusParticles", "desert", "CactusCollection0", int(cactusCount/3.0), 1.0, random.uniform(0.02, 0.03), random.randint(0, 2))
         ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "cactusParticles", "desert", "CactusCollection", cactusCount, 1.0, 0.03, 1)
+            bpy.data.objects["Plane"], "cactusParticles.001", "desert", "CactusCollection1", int(cactusCount/3.0), 1.0, random.uniform(0.02, 0.03), random.randint(2, 4))
         ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "cactusParticles", "desert", "CactusCollection", cactusCount, 1.0, 0.03, 1)
+            bpy.data.objects["Plane"], "cactusParticles.002", "desert", "CactusCollection2", int(cactusCount/3.0), 1.0, random.uniform(0.02, 0.03), random.randint(4, 6))
 
         stone = Stone()
         stone.generateStone()
         ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "stoneParticles", "desert", "StoneCollection", stoneCount, 1.0, 0.025, 1)
+            bpy.data.objects["Plane"], "stoneParticles", "desert", "StoneCollection0", int(stoneCount/3), 1.0, random.uniform(0.02, 0.03), random.randint(0, 2))
+        ParticleUtils.createParticleSystem(
+            bpy.data.objects["Plane"], "stoneParticles.001", "desert", "StoneCollection1", int(stoneCount/3), 1.0, random.uniform(0.02, 0.03), random.randint(2, 4))
+        ParticleUtils.createParticleSystem(
+            bpy.data.objects["Plane"], "stoneParticles.002", "desert", "StoneCollection2", int(stoneCount/3), 1.0, random.uniform(0.02, 0.03), random.randint(4, 6))
 
 
 classes = [MainPanel, DistributionPanel, DesertPanel, ForestPanel, GrassPanel, MountainPanel,
@@ -148,11 +157,11 @@ def register():
     )
     bpy.types.Scene.cactusCount = bpy.props.IntProperty(
         name="Cactus Count",
-        default=50
+        default=30
     )
     bpy.types.Scene.stoneCount = bpy.props.IntProperty(
         name="Stone Count",
-        default=10
+        default=30
     )
     bpy.types.Scene.grassCount = bpy.props.IntProperty(
         name="Grass Count",
@@ -160,7 +169,7 @@ def register():
     )
     bpy.types.Scene.flowerCount = bpy.props.IntProperty(
         name="Flower Count",
-        default=50
+        default=25
     )
     bpy.types.Scene.bushCount = bpy.props.IntProperty(
         name="Bush Count",

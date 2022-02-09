@@ -1,10 +1,5 @@
-from signal import getitimer
 import bpy
 import random
-import typing
-import bmesh
-import mathutils
-import math
 from src import utility
 1
 VERTICES = 9
@@ -46,7 +41,8 @@ class Cactus:
 
     def generateCactus():
         for cactus_version in range(3):
-            collection = bpy.data.collections.new("CactusCollection")
+            collection = bpy.data.collections.new(
+                "CactusCollection" + str(cactus_version))
             bpy.context.scene.collection.children.link(collection)
             RED = random.uniform(0.3, 0.6)
             GREEN = random.uniform(0.2, 0.8)
@@ -55,7 +51,7 @@ class Cactus:
             col = bpy.data.collections.get("Collection")
             col.objects.link(obj)
             bpy.context.view_layer.objects.active = obj
-            LOCATION_X = random.uniform(-5,5)
+            LOCATION_X = random.uniform(-5, 5)
             LOCATION_Y = random.uniform(-5, 5)
             obj.location = (LOCATION_X, LOCATION_Y, 0)
 
@@ -79,12 +75,14 @@ class Cactus:
                     edges.append(edge)
                 if i is 2:  # aussuchen, an welchen Vertex der Zweig haben soll
                     lastIndex = len(verts) - 1
-                    Cactus.generateBranches(edges, verts, vert, True, lastIndex)
+                    Cactus.generateBranches(
+                        edges, verts, vert, True, lastIndex)
                     bool = True
                 # hier auch nochmal (wichtig sind die bool werte zu setzen, sonst wird oben der falsche index für die edge verwendet)
                 elif i is 4:
                     lastIndex = len(verts) - 1
-                    Cactus.generateBranches(edges, verts, vert, False, lastIndex)
+                    Cactus.generateBranches(
+                        edges, verts, vert, False, lastIndex)
                     bool = True
 
             faces = []
@@ -99,7 +97,8 @@ class Cactus:
 
             bpy.ops.object.mode_set(mode='OBJECT')
 
-            skin: bpy.types.SkinModifier = bpy.ops.object.modifier_add(type='SKIN')
+            skin: bpy.types.SkinModifier = bpy.ops.object.modifier_add(
+                type='SKIN')
 
             rad_x = random.uniform(0.75, 1.75)
             rad_y = random.uniform(0.75, 1.75)
@@ -121,8 +120,22 @@ class Cactus:
 
             for modifier in obj.modifiers:
                 bpy.ops.object.modifier_apply(modifier=modifier.name)
-
+            PARTICLES = random.uniform(60, 120)
+            SPIKE_LENGTH = random.uniform(0.2, 0.6)
+            SEED = random.uniform(0, 100)
+            bpy.context.object.modifiers.new(
+                bpy.context.object.name, type='PARTICLE_SYSTEM')
+            particleSystem = bpy.context.object.particle_systems[bpy.context.object.name]
+            particleSystem.settings.type = 'HAIR'
+            particleSystem.settings.count = PARTICLES
+            particleSystem.settings.hair_length = SPIKE_LENGTH
+            particleSystem.child_seed = SEED
             bpy.ops.object.select_all(action='SELECT')
             #spikes: bpy.types.ParticleSystem = bpy.ops.object.particle_system_add()
-            obj.data.materials.append(utility.MaterialUtils.createMaterial("cactus_material", (RED, GREEN, 0.0, 1)))
+            obj.data.materials.append(utility.MaterialUtils.createMaterial(
+                "cactus_material", (RED, GREEN, 0.0, 1)))
+            bpy.context.object.rotation_euler = (
+                0, 0, random.randrange(0, 360))
+            rndScale = random.uniform(1, 2)
+            bpy.context.object.scale = (rndScale, rndScale, rndScale)
             collection.objects.link(bpy.context.object)
