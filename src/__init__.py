@@ -106,6 +106,10 @@ class GenerateBiomeContent():
         Cactus.generateCactus()
         ParticleUtils.createParticleSystem(
             bpy.data.objects["Plane"], "cactusParticles", "desert", "CactusCollection", cactusCount, 1.0, 0.03, 1)
+        ParticleUtils.createParticleSystem(
+            bpy.data.objects["Plane"], "cactusParticles", "desert", "CactusCollection", cactusCount, 1.0, 0.03, 1)
+        ParticleUtils.createParticleSystem(
+            bpy.data.objects["Plane"], "cactusParticles", "desert", "CactusCollection", cactusCount, 1.0, 0.03, 1)
 
         stone = Stone()
         stone.generateStone()
