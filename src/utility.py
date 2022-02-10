@@ -49,6 +49,7 @@ class CleanCollectionsUtils:
             if collection.name != "Collection":
                 for object in collection.objects:
                     object.hide_set(True)
+                    object.hide_render = True
             if collection.name == "Collection":
                 for object in collection.objects:
                     if object.name != "Plane":
