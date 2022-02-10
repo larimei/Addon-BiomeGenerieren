@@ -31,6 +31,7 @@ class ParticleUtils:
         particleSystem.settings.render_type = 'COLLECTION'
         particleSystem.settings.instance_collection = bpy.data.collections[collectionName]
         particleSystem.settings.child_type = 'INTERPOLATED'
+        particleSystem.settings.rendered_child_count = particleSystem.settings.child_nbr
         particleSystem.settings.count = count
         particleSystem.settings.particle_size = size
         particleSystem.settings.size_random = randomSize

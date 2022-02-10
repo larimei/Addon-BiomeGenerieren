@@ -119,11 +119,11 @@ class GenerateBiomeContent():
         stone = Stone()
         stone.generateStone()
         ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "stoneParticles", "desert", "StoneCollection0", int(stoneCount/3), 1.0, random.uniform(0.02, 0.03), random.randint(0, 2))
+            bpy.data.objects["Plane"], "stoneParticles", "desert", "StoneCollection0", int(stoneCount/3), 1.0, random.uniform(0.02, 0.03), random.randint(6, 8))
         ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "stoneParticles.001", "desert", "StoneCollection1", int(stoneCount/3), 1.0, random.uniform(0.02, 0.03), random.randint(2, 4))
+            bpy.data.objects["Plane"], "stoneParticles.001", "desert", "StoneCollection1", int(stoneCount/3), 1.0, random.uniform(0.02, 0.03), random.randint(10, 12))
         ParticleUtils.createParticleSystem(
-            bpy.data.objects["Plane"], "stoneParticles.002", "desert", "StoneCollection2", int(stoneCount/3), 1.0, random.uniform(0.02, 0.03), random.randint(4, 6))
+            bpy.data.objects["Plane"], "stoneParticles.002", "desert", "StoneCollection2", int(stoneCount/3), 1.0, random.uniform(0.02, 0.03), random.randint(12, 14))
 
 
 classes = [MainPanel, DistributionPanel, DesertPanel, ForestPanel, GrassPanel, MountainPanel,
