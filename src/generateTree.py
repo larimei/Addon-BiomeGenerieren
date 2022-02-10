@@ -244,8 +244,8 @@ class Tree():
 
         # Construct the bmesh sphere and assign it to the blender mesh.
         bm = bmesh.new()
-        bmesh.ops.create_uvsphere(
-            bm, u_segments=16, v_segments=8, diameter=radius)
+        bmesh.ops.create_icosphere(
+            bm, subdivisions=2, diameter=radius)
         bm.to_mesh(mesh)
         bm.free()
 
