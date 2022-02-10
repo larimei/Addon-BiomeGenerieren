@@ -242,7 +242,7 @@ def register():
     bpy.types.Scene.forestColor = bpy.props.FloatVectorProperty(
         name="Forest Color",
         subtype="COLOR",
-        default=(0.038, 0.7, 0.05, 1.000000),
+        default=(0.0712, 0.287, 0.068, 1.000000),
         size=4,
         min=0.0,
         max=1.0,

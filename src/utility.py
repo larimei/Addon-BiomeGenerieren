@@ -20,6 +20,24 @@ class MaterialUtils:
         material.node_tree.nodes["Principled BSDF"].inputs[0].default_value = value
 
         return material
+    
+    def create_material_between(_name, _value_one, _value_two):
+    
+        material = bpy.data.materials.new(
+            name=_name)
+        material.use_nodes = True
+        
+        principled_node = material.node_tree.nodes.get('Principled BSDF')
+        
+        mix_node = material.node_tree.nodes.new('ShaderNodeMixRGB')
+        mix_node.inputs[1].default_value = _value_one
+        mix_node.inputs[2].default_value = _value_two        
+        
+        link = material.node_tree.links.new
+        link(mix_node.outputs[0], principled_node.inputs[0])
+
+
+        return material
 
 
 class ParticleUtils:

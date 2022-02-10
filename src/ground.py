@@ -111,16 +111,18 @@ class Ground():
         self.createFaceMask(object=ground, nameGroup="snow", indexes=list(self.snow_faces.keys()), material=utility.MaterialUtils.createMaterial(
             "snow", self.colors[4]))
 
-        self.createGradient(object=ground, name='desert', otherName='forest', material=utility.MaterialUtils.createMaterial(
-            "desert-forest", (0, 0, 0, 1)))
-        self.createGradient(object=ground, name='desert', otherName='grass', material=utility.MaterialUtils.createMaterial(
-            "desert-grass", (0, 0, 0, 1)))
-        self.createGradient(object=ground, name='mountain', otherName='forest', material=utility.MaterialUtils.createMaterial(
-            "forest-mountain", (0, 0, 0, 1)))
-        self.createGradient(object=ground, name='forest', otherName='grass', material=utility.MaterialUtils.createMaterial(
-            "forest-grass", (0, 0, 0, 1)))
-        self.createGradient(object=ground, name='mountain', otherName='grass', material=utility.MaterialUtils.createMaterial(
-            "grass-mountain", (0, 0, 0, 1)))
+        self.createGradient(object=ground, name='desert', otherName='forest', material=utility.MaterialUtils.create_material_between(
+            "desert-forest", self.colors[2], self.colors[1]))
+        self.createGradient(object=ground, name='desert', otherName='grass', material=utility.MaterialUtils.create_material_between(
+            "desert-grass", self.colors[2], self.colors[1]))
+        self.createGradient(object=ground, name='forest', otherName='grass', material=utility.MaterialUtils.create_material_between(
+            "forest-grass", self.colors[1], self.colors[0]))
+        self.createGradient(object=ground, name='mountain', otherName='grass', material=utility.MaterialUtils.create_material_between(
+            "mountain-grass", self.colors[3], self.colors[0]))
+        self.createGradient(object=ground, name='mountain', otherName='forest', material=utility.MaterialUtils.create_material_between(
+            "mountain-forest", self.colors[3], self.colors[1]))
+        self.createGradient(object=ground, name='mountain', otherName='desert', material=utility.MaterialUtils.create_material_between(
+            "mountain-desert", self.colors[3], self.colors[2]))
 
         # Add Decimate Modifier for Tris:
         bpy.ops.object.select_pattern(
