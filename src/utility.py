@@ -20,22 +20,21 @@ class MaterialUtils:
         material.node_tree.nodes["Principled BSDF"].inputs[0].default_value = value
 
         return material
-    
+
     def create_material_between(_name, _value_one, _value_two):
-    
+
         material = bpy.data.materials.new(
             name=_name)
         material.use_nodes = True
-        
+
         principled_node = material.node_tree.nodes.get('Principled BSDF')
-        
+
         mix_node = material.node_tree.nodes.new('ShaderNodeMixRGB')
         mix_node.inputs[1].default_value = _value_one
-        mix_node.inputs[2].default_value = _value_two        
-        
+        mix_node.inputs[2].default_value = _value_two
+
         link = material.node_tree.links.new
         link(mix_node.outputs[0], principled_node.inputs[0])
-
 
         return material
 
@@ -63,12 +62,19 @@ class ParticleUtils:
 
 class CleanCollectionsUtils:
     def cleanSystem():
+        view_layer = bpy.context.scene.view_layers["View Layer"]
+        collection_include = bpy.data.collections["Collection"]
+        CleanCollectionsUtils.include_only_one_collection(
+            view_layer, collection_include)
         for collection in bpy.data.collections:
-            if collection.name != "Collection":
-                for object in collection.objects:
-                    object.hide_set(True)
-                    object.hide_render = True
             if collection.name == "Collection":
                 for object in collection.objects:
                     if object.name != "Plane":
                         collection.objects.unlink(object)
+
+    def include_only_one_collection(view_layer: bpy.types.ViewLayer, collection_include: bpy.types.Collection):
+        for layer_collection in view_layer.layer_collection.children:
+            if layer_collection.collection != collection_include:
+                layer_collection.exclude = True
+            else:
+                layer_collection.exclude = False
