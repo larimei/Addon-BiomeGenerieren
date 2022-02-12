@@ -99,16 +99,16 @@ class Ground():
 
         ground_mesh.to_mesh(ground.data)
         ground_mesh.free()
-        self.createFaceMask(object=ground, nameGroup="grass", indexes=list(self.grass_faces.keys()), material=utility.MaterialUtils.createMaterial(
+        self.createFaceMask(object=ground, nameGroup="grass", indexes=list(self.grass_faces.keys()), material=utility.MaterialUtils.create_material(
             "grass", self.colors[0]))
-        self.createFaceMask(object=ground, nameGroup="forest", indexes=list(self.forest_faces.keys()), material=utility.MaterialUtils.createMaterial(
+        self.createFaceMask(object=ground, nameGroup="forest", indexes=list(self.forest_faces.keys()), material=utility.MaterialUtils.create_material(
             "forest", self.colors[1]))
 
-        self.createFaceMask(object=ground, nameGroup="desert", indexes=list(self.desert_faces.keys()), material=utility.MaterialUtils.createMaterial(
+        self.createFaceMask(object=ground, nameGroup="desert", indexes=list(self.desert_faces.keys()), material=utility.MaterialUtils.create_material(
             "desert", self.colors[2]))
-        self.createFaceMask(object=ground, nameGroup="mountain", indexes=list(self.mountain_faces.keys()), material=utility.MaterialUtils.createMaterial(
+        self.createFaceMask(object=ground, nameGroup="mountain", indexes=list(self.mountain_faces.keys()), material=utility.MaterialUtils.create_material(
             "mountain", self.colors[3]))
-        self.createFaceMask(object=ground, nameGroup="snow", indexes=list(self.snow_faces.keys()), material=utility.MaterialUtils.createMaterial(
+        self.createFaceMask(object=ground, nameGroup="snow", indexes=list(self.snow_faces.keys()), material=utility.MaterialUtils.create_material(
             "snow", self.colors[4]))
 
         self.createGradient(object=ground, name='desert', otherName='forest', material=utility.MaterialUtils.create_material_between(
@@ -232,7 +232,7 @@ class VoronoiNoise:
         self.distribution, self.biome_allowed = self.calcDistributions(
             grassWeight, forestWeight, desertWeight, mountainWeight)
         bpy.ops.texture.new()
-        tex_clr = utility.TextureUtils.getTextureIfExists("Voronoi")
+        tex_clr = utility.TextureUtils.get_texture_if_exists("Voronoi")
         tex_clr.name = "Voronoi"
         tex_clr.type = 'VORONOI'
         self.voronoi_clr: bpy.types.VoronoiTexture = bpy.data.textures["Voronoi"]
@@ -241,7 +241,7 @@ class VoronoiNoise:
         self.voronoi_clr.noise_scale = scale
 
         bpy.ops.texture.new()
-        tex_weight = utility.TextureUtils.getTextureIfExists("Weight")
+        tex_weight = utility.TextureUtils.get_texture_if_exists("Weight")
         tex_weight.name = "Weight"
         tex_weight.type = 'VORONOI'
         self.voronoi_weight: bpy.types.VoronoiTexture = bpy.data.textures["Weight"]
@@ -287,7 +287,7 @@ class GlobalNoise:
 
     def __init__(self, scale: float):
         bpy.ops.texture.new()
-        tex_clr = utility.TextureUtils.getTextureIfExists("GlobalNoise")
+        tex_clr = utility.TextureUtils.get_texture_if_exists("GlobalNoise")
         tex_clr.name = "GlobalNoise"
         tex_clr.type = 'CLOUDS'
         self.cloud: bpy.types.CloudsTexture = bpy.data.textures["GlobalNoise"]
@@ -303,7 +303,7 @@ class MountainNoise:
 
     def __init__(self, scale: float, distortion: float):
         bpy.ops.texture.new()
-        tex_clr = utility.TextureUtils.getTextureIfExists("Mountain")
+        tex_clr = utility.TextureUtils.get_texture_if_exists("Mountain")
         tex_clr.name = "Mountain"
         tex_clr.type = 'DISTORTED_NOISE'
         self.mountain: bpy.types.DistortedNoiseTexture = bpy.data.textures["Mountain"]
@@ -319,7 +319,7 @@ class DesertNoise:
 
     def __init__(self, scale: float, turbulence: float):
         bpy.ops.texture.new()
-        tex_clr = utility.TextureUtils.getTextureIfExists("Desert")
+        tex_clr = utility.TextureUtils.get_texture_if_exists("Desert")
         tex_clr.name = "Desert"
         tex_clr.type = 'STUCCI'
         self.desert: bpy.types.StucciTexture = bpy.data.textures["Desert"]
@@ -335,7 +335,7 @@ class PlainNoise:
 
     def __init__(self, scale: float, depth: float):
         bpy.ops.texture.new()
-        tex_clr = utility.TextureUtils.getTextureIfExists("Plain")
+        tex_clr = utility.TextureUtils.get_texture_if_exists("Plain")
         tex_clr.name = "Plain"
         tex_clr.type = 'CLOUDS'
         self.plain: bpy.types.StucciTexture = bpy.data.textures["Plain"]

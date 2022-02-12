@@ -107,7 +107,7 @@ class Tree():
         bpy.ops.object.modifier_add(type='SUBSURF')
         bpy.context.object.modifiers["Subdivision"].render_levels = 1
         bpy.context.object.data.materials.append(
-            utility.MaterialUtils.createMaterial("trunkMaterial", (0.3, 0.152, 0.02, 1.000000)))
+            utility.MaterialUtils.create_material("trunkMaterial", (0.3, 0.152, 0.02, 1.000000)))
 
         leaves = bpy.ops.mesh.primitive_ico_sphere_add(radius=random.uniform(1, 1.2), enter_editmode=False, align='WORLD', location=(
             posX, posY, posZ + 4), scale=(random.uniform(2.5, 4), random.uniform(2.5, 4), random.uniform(4, 6)))
@@ -117,7 +117,7 @@ class Tree():
         bpy.context.object.parent = obj
 
         bpy.context.object.data.materials.append(
-            utility.MaterialUtils.createMaterial("leaveMaterial", (0.038, 0.7, 0.05, 1.000000)))
+            utility.MaterialUtils.create_material("leaveMaterial", (0.038, 0.7, 0.05, 1.000000)))
 
     def generateCylinder(location, scale, width_scale_top, width_scale_bottom, trunk):
         mesh = bpy.ops.mesh.primitive_cylinder_add(
@@ -180,7 +180,7 @@ class Tree():
 
                 active = bpy.context.object
                 collection.objects.link(active)
-                bpy.context.object.data.materials.append(utility.MaterialUtils.createMaterial(
+                bpy.context.object.data.materials.append(utility.MaterialUtils.create_material(
                     "pineTrunkMaterial", (0.051, 0.010, 0.00, 1.000000)))
                 bpy.ops.collection.objects_remove(collection='Collection')
 
@@ -198,7 +198,7 @@ class Tree():
                 bpy.context.object.parent = active
                 active = bpy.context.object
                 collection.objects.link(active)
-                bpy.context.object.data.materials.append(utility.MaterialUtils.createMaterial(
+                bpy.context.object.data.materials.append(utility.MaterialUtils.create_material(
                     "pineMaterial", (0.009, 0.141, 0.058, 1.000000)))
                 bpy.ops.collection.objects_remove(collection='Collection')
 
@@ -251,7 +251,7 @@ class Tree():
 
         bpy.context.object.scale = scale
         bpy.context.object.location = position
-        bpy.context.object.data.materials.append(utility.MaterialUtils.createMaterial(
+        bpy.context.object.data.materials.append(utility.MaterialUtils.create_material(
             "branchLeaveMaterial", (0.03, 0.6, 0.04, 1.000000)))
 
     def generateMoreTrunk(edges, verts, vert):
@@ -347,7 +347,7 @@ class Tree():
         bpy.ops.object.modifier_add(type='SUBSURF')
         bpy.context.object.modifiers["Subdivision"].render_levels = 1
 
-        bpy.context.object.data.materials.append(utility.MaterialUtils.createMaterial(
+        bpy.context.object.data.materials.append(utility.MaterialUtils.create_material(
             "branchTrunkMaterial", (0.279, 0.122, 0.01, 1.000000)))
 
         for modifier in obj.modifiers:

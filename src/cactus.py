@@ -9,18 +9,6 @@ HEIGHT = 1.5
 
 
 class Cactus:
-    # def generateSpikes():
-
-    #     PARTICLES = random.uniform(60, 120)
-    #     SPIKE_LENGTH = random.uniform(0.2, 0.6)
-    #     SEED = random.uniform(0, 100)
-
-    #     bpy.ops.object.particle_system_add()
-    #     bpy.data.particles["ParticleSettings"].type = 'HAIR'
-    #     bpy.data.particles["ParticleSettings"].count = PARTICLES
-    #     bpy.data.particles["ParticleSettings"].hair_length = SPIKE_LENGTH
-    #     bpy.data.particle_systems["ParticleSettings"].seed = SEED
-
     def generateBranches(edges, verts, vert, branch, lastIndex):
         for i in range(random.randrange(3, 6)):
             if branch:
@@ -132,7 +120,7 @@ class Cactus:
             particleSystem.child_seed = SEED
             bpy.ops.object.select_all(action='SELECT')
             #spikes: bpy.types.ParticleSystem = bpy.ops.object.particle_system_add()
-            obj.data.materials.append(utility.MaterialUtils.createMaterial(
+            obj.data.materials.append(utility.MaterialUtils.create_material(
                 "cactus_material", (RED, GREEN, 0.0, 1)))
             bpy.context.object.rotation_euler = (
                 0, 0, random.randrange(0, 360))

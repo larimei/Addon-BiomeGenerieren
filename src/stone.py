@@ -33,7 +33,7 @@ class Stone:
             #bpy.ops.mesh.name = "stone"
             bpy.ops.object.shade_flat()
 
-            bpy.context.object.data.materials.append(utility.MaterialUtils.createMaterial(
+            bpy.context.object.data.materials.append(utility.MaterialUtils.create_material(
                 "stone_material", (GREYTONE, GREYTONE, GREYTONE, 1)))
 
             currentmesh = bpy.context.object.data

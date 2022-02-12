@@ -2,7 +2,7 @@ import bpy
 
 
 class TextureUtils:
-    def getTextureIfExists(name: str):
+    def get_texture_if_exists(name: str):
         try:
             tex = bpy.data.textures[name]
             bpy.data.textures.remove(bpy.data.textures["Texture"])
@@ -12,7 +12,7 @@ class TextureUtils:
 
 
 class MaterialUtils:
-    def createMaterial(name, value):
+    def create_material(name, value):
 
         material = bpy.data.materials.new(
             name=name)
@@ -40,28 +40,28 @@ class MaterialUtils:
 
 
 class ParticleUtils:
-    def createParticleSystem(object, name, vertexGroup, collectionName, count, randomSize, size, seed):
-        bpy.context.view_layer.objects.active = object
-        object.modifiers.new(name, type='PARTICLE_SYSTEM')
-        particleSystem = object.particle_systems[name]
-        particleSystem.settings.type = 'HAIR'
-        particleSystem.settings.render_type = 'COLLECTION'
-        particleSystem.settings.instance_collection = bpy.data.collections[collectionName]
-        particleSystem.settings.child_type = 'INTERPOLATED'
-        particleSystem.settings.rendered_child_count = particleSystem.settings.child_nbr
-        particleSystem.settings.count = count
-        particleSystem.settings.particle_size = size
-        particleSystem.settings.size_random = randomSize
-        particleSystem.settings.use_whole_collection = True
-        particleSystem.settings.use_advanced_hair = True
-        particleSystem.settings.rotation_mode = 'NONE'
-        particleSystem.settings.use_even_distribution = False
-        particleSystem.seed = seed
-        particleSystem.vertex_group_density = vertexGroup
+    def create_particle_system(_object, _name, _vertex_group, _collection_name, _count, _random_size, _size, _seed):
+        bpy.context.view_layer.objects.active = _object
+        _object.modifiers.new(_name, type='PARTICLE_SYSTEM')
+        particle_system = _object.particle_systems[_name]
+        particle_system.settings.type = 'HAIR'
+        particle_system.settings.render_type = 'COLLECTION'
+        particle_system.settings.instance_collection = bpy.data.collections[_collection_name]
+        particle_system.settings.child_type = 'INTERPOLATED'
+        particle_system.settings.rendered_child_count = particle_system.settings.child_nbr
+        particle_system.settings.count = _count
+        particle_system.settings.particle_size = _size
+        particle_system.settings.size_random = _random_size
+        particle_system.settings.use_whole_collection = True
+        particle_system.settings.use_advanced_hair = True
+        particle_system.settings.rotation_mode = 'NONE'
+        particle_system.settings.use_even_distribution = False
+        particle_system.seed = _seed
+        particle_system.vertex_group_density = _vertex_group
 
 
 class CleanCollectionsUtils:
-    def cleanSystem():
+    def clean_system():
         view_layer = bpy.context.scene.view_layers["View Layer"]
         collection_include = bpy.data.collections["Collection"]
         CleanCollectionsUtils.include_only_one_collection(
