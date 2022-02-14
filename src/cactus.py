@@ -1,7 +1,7 @@
 import bpy
 import random
 from src import utility
-1
+
 VERTICES = 9
 MIN_SHIFT = 0.5
 MAX_SHIFT = 1.5
@@ -9,68 +9,68 @@ HEIGHT = 1.5
 
 
 class Cactus:
-    def generateBranches(edges, verts, vert, branch, lastIndex):
+    def generate_branches(_edges, _verts, _vert, _branch, _last_index):
         for i in range(random.randrange(3, 6)):
-            if branch:
-                branchvert = (vert[0] + random.uniform(0.5, 1.25), vert[1] +
-                              random.uniform(0.5, 1.25), vert[2] + random.uniform(0.5, 1.25))  # plus statt minus dass es nach oben geht
-            elif branch is False:
-                branchvert = (vert[0] + random.uniform(-1.5, -0.25), vert[1] +
-                              random.uniform(-1.5, -0.25), vert[2] + random.uniform(0.25, 1.5))  # plus statt minus dass es nach oben geht
+            if _branch:
+                branch_vert = (_vert[0] + random.uniform(0.5, 1.25), _vert[1] +
+                              random.uniform(0.5, 1.25), _vert[2] + random.uniform(0.5, 1.25))  # plus statt minus dass es nach oben geht
+            elif _branch is False:
+                branch_vert = (_vert[0] + random.uniform(-1.5, -0.25), _vert[1] +
+                              random.uniform(-1.5, -0.25), _vert[2] + random.uniform(0.25, 1.5))  # plus statt minus dass es nach oben geht
 
-            vert = branchvert
-            verts.append(branchvert)
+            _vert = branch_vert
+            _verts.append(branch_vert)
             if i is 0:
-                edge = (lastIndex, len(verts) - 1)
+                edge = (_last_index, len(_verts) - 1)
             else:
-                edge = (len(verts) - 2, len(verts)-1)
+                edge = (len(_verts) - 2, len(_verts)-1)
 
-            edges.append(edge)
+            _edges.append(edge)
 
-    def generateCactus():
+    def generate_cactus():
         for cactus_version in range(3):
             collection = bpy.data.collections.new(
                 "CactusCollection" + str(cactus_version))
             bpy.context.scene.collection.children.link(collection)
-            RED = random.uniform(0.3, 0.6)
-            GREEN = random.uniform(0.2, 0.8)
+            red = random.uniform(0.3, 0.6)
+            green = random.uniform(0.2, 0.8)
             mesh = bpy.data.meshes.new("cactus")  # add the new mesh
             obj = bpy.data.objects.new(mesh.name, mesh)
             col = bpy.data.collections.get("Collection")
             col.objects.link(obj)
             bpy.context.view_layer.objects.active = obj
-            LOCATION_X = random.uniform(-5, 5)
-            LOCATION_Y = random.uniform(-5, 5)
-            obj.location = (LOCATION_X, LOCATION_Y, 0)
+            location_x = random.uniform(-5, 5)
+            location_y = random.uniform(-5, 5)
+            obj.location = (location_x, location_y, 0)
 
             verts = []
             edges = []
 
             bool = False
             for i in range(VERTICES):
-                posZ = i * HEIGHT
-                posY = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT)
-                posX = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT)
-                vert = (posX, posY, posZ)
+                pos_z = i * HEIGHT
+                pos_y = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT)
+                pos_x = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT)
+                vert = (pos_x, pos_y, pos_z)
                 verts.append(vert)
                 if i is not 0:
                     if bool:
                         # ab hier geändert, dass man auch mitten drin zweige einfügen kann (sonst werden die Vertices immer an das letzte gehängt)
-                        edge = (lastIndex, len(verts) - 1)
+                        edge = (last_index, len(verts) - 1)
                         bool = False
                     else:
                         edge = (len(verts) - 2, len(verts) - 1)
                     edges.append(edge)
                 if i is 2:  # aussuchen, an welchen Vertex der Zweig haben soll
-                    lastIndex = len(verts) - 1
-                    Cactus.generateBranches(
-                        edges, verts, vert, True, lastIndex)
+                    last_index = len(verts) - 1
+                    Cactus.generate_branches(
+                        edges, verts, vert, True, last_index)
                     bool = True
                 # hier auch nochmal (wichtig sind die bool werte zu setzen, sonst wird oben der falsche index für die edge verwendet)
                 elif i is 4:
-                    lastIndex = len(verts) - 1
-                    Cactus.generateBranches(
-                        edges, verts, vert, False, lastIndex)
+                    last_index = len(verts) - 1
+                    Cactus.generate_branches(
+                        edges, verts, vert, False, last_index)
                     bool = True
 
             faces = []
@@ -108,22 +108,22 @@ class Cactus:
 
             for modifier in obj.modifiers:
                 bpy.ops.object.modifier_apply(modifier=modifier.name)
-            PARTICLES = random.uniform(60, 120)
-            SPIKE_LENGTH = random.uniform(0.2, 0.6)
-            SEED = random.uniform(0, 100)
+            particles = random.uniform(60, 120)
+            spike_length = random.uniform(0.2, 0.6)
+            seed = random.uniform(0, 100)
             bpy.context.object.modifiers.new(
                 bpy.context.object.name, type='PARTICLE_SYSTEM')
-            particleSystem = bpy.context.object.particle_systems[bpy.context.object.name]
-            particleSystem.settings.type = 'HAIR'
-            particleSystem.settings.count = PARTICLES
-            particleSystem.settings.hair_length = SPIKE_LENGTH
-            particleSystem.child_seed = SEED
+            particle_system = bpy.context.object.particle_systems[bpy.context.object.name]
+            particle_system.settings.type = 'HAIR'
+            particle_system.settings.count = particles
+            particle_system.settings.hair_length = spike_length
+            particle_system.child_seed = seed
             bpy.ops.object.select_all(action='SELECT')
             #spikes: bpy.types.ParticleSystem = bpy.ops.object.particle_system_add()
             obj.data.materials.append(utility.MaterialUtils.create_material(
-                "cactus_material", (RED, GREEN, 0.0, 1)))
+                "cactus_material", (red, green, 0.0, 1)))
             bpy.context.object.rotation_euler = (
                 0, 0, random.randrange(0, 360))
-            rndScale = random.uniform(1, 2)
-            bpy.context.object.scale = (rndScale, rndScale, rndScale)
+            rnd_scale = random.uniform(1, 2)
+            bpy.context.object.scale = (rnd_scale, rnd_scale, rnd_scale)
             collection.objects.link(bpy.context.object)
