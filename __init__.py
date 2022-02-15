@@ -6,7 +6,7 @@ from src.biomes.generateTreeBiome import Tree
 from src.biomes.cactus import Cactus
 from src.biomes.stone import Stone
 from src.utility import CleanCollectionsUtils, ParticleUtils
-from src.ui import *
+from src.ui import GENERATEBIOMES_PT_DesertPanel, GENERATEBIOMES_PT_DistributionPanel, GENERATEBIOMES_PT_ForestPanel, GENERATEBIOMES_PT_GrassPanel, GENERATEBIOMES_PT_MainPanel, GENERATEBIOMES_PT_MountainPanel
 import bpy
 
 
