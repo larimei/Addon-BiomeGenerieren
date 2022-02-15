@@ -93,7 +93,6 @@ class Ground():
 
         self.add_materials(_ground=ground)
 
-        # Add Decimate Modifier for Tris:
         bpy.ops.object.select_pattern(
             pattern="Ground", case_sensitive=True, extend=False)
         bpy.ops.object.modifier_add(type='DECIMATE')

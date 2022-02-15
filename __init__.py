@@ -108,7 +108,6 @@ class GenerateBiomeContent():
             bpy.data.objects["Plane"], "branchParticles", "forest", "TreeWithBranchesCollection", _branch_count, 0, random.uniform(0.06, 0.07), random.randint(4, 6))
 
     def generate_desert_biome(_cactus_count, _stone_count):
-        # generate Desert content here
         Cactus.generate_cactus()
         ParticleUtils.create_particle_system(
             bpy.data.objects["Plane"], "cactusParticles", "desert", "CactusCollection0", int(_cactus_count/3.0), 1.0, random.uniform(0.02, 0.03), random.randint(0, 2))
