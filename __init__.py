@@ -1,13 +1,12 @@
-
+import bpy
 import random
 from . src.ground import Ground
 from . src.biomes.generateGrassBiome import GenerateGrassBiome
 from . src.biomes.generateTreeBiome import Tree
-from . src.biomes.cactus import Cactus
-from . src.biomes.stone import Stone
+from . src.biomes.generateDesertBiome import Cactus
+from . src.biomes.generateDesertBiome import Stone
 from . src.utility import CleanCollectionsUtils, ParticleUtils
 from . src.ui import *
-import bpy
 
 
 bl_info = {
