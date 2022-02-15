@@ -150,9 +150,9 @@ class Tree():
 
         for i in range(0, 8):
             face: BMFaceSeq = bm.faces[i]
-            if i is 4:
+            if i == 4:
                 scale = width_scale_top
-            elif i is 7:
+            elif i == 7:
                 scale = width_scale_bottom
             else:
                 scale = random.uniform(0.9, 1.1)
@@ -174,7 +174,7 @@ class Tree():
         height = 0
 
         for i in range(0, AMOUNT + 1):
-            if i is 0:
+            if i == 0:
                 Tree.generate_cylinder(
                     (x, y, z), (1, 1, 0.75), 0.6, 1, True)
 
@@ -185,7 +185,7 @@ class Tree():
                 bpy.ops.collection.objects_remove(collection='Collection')
 
             else:
-                if i is AMOUNT:
+                if i == AMOUNT:
                     Tree.generate_cylinder(
                         (x, y, z + height), (1, 1, 0.8), 0.07, bottom, False)
                 else:
@@ -211,15 +211,10 @@ class Tree():
             elif branch is False:
                 branchvert = (vert[0] + random.uniform(-0.8, -0.2), vert[1] +
                               random.uniform(-0.8, -0.2), vert[2] + random.uniform(0.2, 0.8))
-            """ elif branch is 3:
-                branchVert = (vert[0] + random.uniform(-1,0), vert[1] + \
-                              random.uniform(0,1), vert[2] + random.uniform(0,1))
-            elif branch is 4:
-                branchVert = (vert[0] + random.uniform(0,1), vert[1] + random.uniform(-1,0), vert[2] + random.uniform(0,1)) """
 
             vert = branchvert
             verts.append(branchvert)
-            if i is 0:
+            if i == 0:
                 edge = (lastIndex - 1, len(verts) - 1)
             else:
                 if bool:
@@ -261,7 +256,7 @@ class Tree():
             pos_x = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT)
             vert = (pos_x, pos_y, pos_z)
             verts.append(vert)
-            if i is not 0:
+            if i != 0:
                 edge = (len(verts)-2, len(verts)-1)
                 edges.append(edge)
             else:
@@ -289,7 +284,7 @@ class Tree():
             vert = (pos_x, pos_y, pos_z)
             verts.append(vert)
             verts_trunk.append(vert)
-            if i is not 0:
+            if i != 0:
                 edge = (i-1, i)
                 edges.append(edge)
 
@@ -336,7 +331,7 @@ class Tree():
         for v in me.skin_vertices[0].data:
             if i < len(verts_trunk) - 1:
                 v.radius = rad_x, rad_y
-                if i is 0:
+                if i == 0:
                     rad_x = random.uniform(0.65, 0.85)
                     rad_y = random.uniform(0.65, 0.85)
                 else:

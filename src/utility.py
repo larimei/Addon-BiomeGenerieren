@@ -1,6 +1,7 @@
 import bpy
 import bmesh
 
+
 class TextureUtils:
     def get_texture_if_exists(name: str):
         try:
@@ -79,6 +80,7 @@ class CleanCollectionsUtils:
             else:
                 layer_collection.exclude = False
 
+
 class GroundUtils:
 
     def create_gradient(self, object: bpy.types.Object, name, otherName, material):
@@ -95,7 +97,6 @@ class GroundUtils:
 
         for map in object.face_maps:
             if map.name != name and map.name != otherName:
-                print(map.name)
                 object.face_maps.active_index = map.index
                 bpy.ops.object.face_map_deselect()
 
@@ -135,4 +136,3 @@ class GroundUtils:
         vertexGroup: bpy.types.VertexGroup = object.vertex_groups.new(
             name=nameGroup)
         vertexGroup.add(Verts, 1.0, 'REPLACE')
-

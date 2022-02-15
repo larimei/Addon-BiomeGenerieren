@@ -13,14 +13,14 @@ class Cactus:
         for i in range(random.randrange(3, 6)):
             if _branch:
                 branch_vert = (_vert[0] + random.uniform(0.5, 1.25), _vert[1] +
-                              random.uniform(0.5, 1.25), _vert[2] + random.uniform(0.5, 1.25))  # plus statt minus dass es nach oben geht
+                               random.uniform(0.5, 1.25), _vert[2] + random.uniform(0.5, 1.25))  # plus statt minus dass es nach oben geht
             elif _branch is False:
                 branch_vert = (_vert[0] + random.uniform(-1.5, -0.25), _vert[1] +
-                              random.uniform(-1.5, -0.25), _vert[2] + random.uniform(0.25, 1.5))  # plus statt minus dass es nach oben geht
+                               random.uniform(-1.5, -0.25), _vert[2] + random.uniform(0.25, 1.5))  # plus statt minus dass es nach oben geht
 
             _vert = branch_vert
             _verts.append(branch_vert)
-            if i is 0:
+            if i == 0:
                 edge = (_last_index, len(_verts) - 1)
             else:
                 edge = (len(_verts) - 2, len(_verts)-1)
@@ -53,7 +53,7 @@ class Cactus:
                 pos_x = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT)
                 vert = (pos_x, pos_y, pos_z)
                 verts.append(vert)
-                if i is not 0:
+                if i != 0:
                     if bool:
                         # ab hier geändert, dass man auch mitten drin zweige einfügen kann (sonst werden die Vertices immer an das letzte gehängt)
                         edge = (last_index, len(verts) - 1)
@@ -61,13 +61,13 @@ class Cactus:
                     else:
                         edge = (len(verts) - 2, len(verts) - 1)
                     edges.append(edge)
-                if i is 2:  # aussuchen, an welchen Vertex der Zweig haben soll
+                if i == 2:  # aussuchen, an welchen Vertex der Zweig haben soll
                     last_index = len(verts) - 1
                     Cactus.generate_branches(
                         edges, verts, vert, True, last_index)
                     bool = True
                 # hier auch nochmal (wichtig sind die bool werte zu setzen, sonst wird oben der falsche index für die edge verwendet)
-                elif i is 4:
+                elif i == 4:
                     last_index = len(verts) - 1
                     Cactus.generate_branches(
                         edges, verts, vert, False, last_index)
@@ -95,7 +95,7 @@ class Cactus:
 
             for v in me.skin_vertices[0].data:
                 v.radius = rad_x, rad_y
-                if i is 0:
+                if i == 0:
                     rad_x = random.uniform(0.75, 2.0)
                     rad_y = random.uniform(0.75, 2.0)
                 else:
