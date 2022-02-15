@@ -5,7 +5,7 @@ import random
 import bmesh
 import mathutils
 import math
-from src import utility
+from ...src import utility
 
 LEAVEMATERIAL: bpy.types.Material
 TRUNKMATERIAL: bpy.types.Material

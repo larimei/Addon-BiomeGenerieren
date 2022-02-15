@@ -1,12 +1,12 @@
 
 import random
-from src.ground import Ground
-from src.biomes.generateGrassBiome import GenerateGrassBiome
-from src.biomes.generateTreeBiome import Tree
-from src.biomes.cactus import Cactus
-from src.biomes.stone import Stone
-from src.utility import CleanCollectionsUtils, ParticleUtils
-from src.ui import *
+from . src.ground import Ground
+from . src.biomes.generateGrassBiome import GenerateGrassBiome
+from . src.biomes.generateTreeBiome import Tree
+from . src.biomes.cactus import Cactus
+from . src.biomes.stone import Stone
+from . src.utility import CleanCollectionsUtils, ParticleUtils
+from . src.ui import *
 import bpy
 
 

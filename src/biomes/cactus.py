@@ -1,6 +1,6 @@
 import bpy
 import random
-from src.utility import MaterialUtils
+from ...src.utility import MaterialUtils
 
 VERTICES = 9
 MIN_SHIFT = 0.5

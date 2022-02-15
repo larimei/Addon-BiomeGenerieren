@@ -1,5 +1,5 @@
 import bpy
-from src.utility import TextureUtils
+from ...src.utility import TextureUtils
 
 
 class GlobalNoise:

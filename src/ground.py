@@ -4,12 +4,12 @@ import bpy
 import bmesh
 import math
 
-from src.utility import GroundUtils, MaterialUtils
-from src.noise_classes.desert_noise import DesertNoise
-from src.noise_classes.mountain_noise import MountainNoise
-from src.noise_classes.plain_noise import PlainNoise
-from src.noise_classes.global_noise import GlobalNoise
-from src.noise_classes.voronoi_noise import VoronoiNoise
+from . utility import GroundUtils, MaterialUtils
+from . noise_classes.desert_noise import DesertNoise
+from . noise_classes.mountain_noise import MountainNoise
+from . noise_classes.plain_noise import PlainNoise
+from . noise_classes.global_noise import GlobalNoise
+from . noise_classes.voronoi_noise import VoronoiNoise
 
 
 class Ground():

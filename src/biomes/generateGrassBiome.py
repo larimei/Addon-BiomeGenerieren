@@ -4,7 +4,7 @@ import mathutils
 import random
 import bpy
 
-from src import utility
+from ...src import utility
 
 
 class GenerateGrassBiome ():

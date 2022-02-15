@@ -1,7 +1,7 @@
 import bpy
 import random
 
-from src.utility import MaterialUtils
+from ...src.utility import MaterialUtils
 
 
 class Stone:
