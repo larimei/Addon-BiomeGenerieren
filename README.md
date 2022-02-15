@@ -7,6 +7,11 @@ Landschaft generieren, verschiedene Biome innerhalb des Terrains mit verschieden
 
 ### Parameter:
 - Größe des gesamten Terrains
-- Verschiedene Biome zum Auswählen (Wasser, Wald, Wüste, Steppe(?)… // werden aber auf max. 3-4 begrenzt)
+- Verschiedene Biome zum Auswählen (Wald, Wiese, Wüste, Berge)
 - Anteile der Biome innerhalb des gesamten Terrains 
-- Einzelne Parameter für das jeweilige Biom (z.B. im Wald die Dichte der Bäume, in der Wüste die Anzahl der Kakteen, oder im Wasser der Anteil von Inseln)
+- Einzelne Parameter für das jeweilige Biom (Anzahl der Objekte, Farbe der Landschaft)
+
+
+### Installation
+- downloade Repository als .zip
+- In Blender: unter Edit -> Preferences -> Install: und wähle dann die gedownloadete .zip
