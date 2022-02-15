@@ -56,7 +56,7 @@ class GENERATEBIOMES_OT_generate_ground(bpy.types.Operator):
         ground = Ground(int(context.scene.size), float(context.scene.groundEdgeSize), int(context.scene.offsetX), int(
             context.scene.offsetY), float(context.scene.biomeScale), float(context.scene.snowBorder), weights=weights, colors=colors)
 
-        ground.generate_ground(context)
+        ground.generate_ground()
         # grass--------------------------
         GenerateBiomeContent.generate_grass_biome(int(context.scene.grassCount),
                                                   int(context.scene.flowerCount), int(context.scene.bushCount))

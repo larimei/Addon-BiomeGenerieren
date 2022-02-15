@@ -3,9 +3,9 @@ import bmesh
 
 
 class TextureUtils:
-    def get_texture_if_exists(name: str):
+    def get_texture_if_exists(_name: str):
         try:
-            tex = bpy.data.textures[name]
+            tex = bpy.data.textures[_name]
             bpy.data.textures.remove(bpy.data.textures["Texture"])
         except KeyError:
             tex = bpy.data.textures["Texture"]
@@ -13,12 +13,12 @@ class TextureUtils:
 
 
 class MaterialUtils:
-    def create_material(name, value):
+    def create_material(_name, _value):
 
         material = bpy.data.materials.new(
-            name=name)
+            name=_name)
         material.use_nodes = True
-        material.node_tree.nodes["Principled BSDF"].inputs[0].default_value = value
+        material.node_tree.nodes["Principled BSDF"].inputs[0].default_value = _value
 
         return material
 
@@ -73,9 +73,9 @@ class CleanCollectionsUtils:
                     if object.name != "Plane":
                         collection.objects.unlink(object)
 
-    def include_only_one_collection(view_layer: bpy.types.ViewLayer, collection_include: bpy.types.Collection):
-        for layer_collection in view_layer.layer_collection.children:
-            if layer_collection.collection != collection_include:
+    def include_only_one_collection(_view_layer: bpy.types.ViewLayer, _collection_include: bpy.types.Collection):
+        for layer_collection in _view_layer.layer_collection.children:
+            if layer_collection.collection != _collection_include:
                 layer_collection.exclude = True
             else:
                 layer_collection.exclude = False
@@ -83,25 +83,25 @@ class CleanCollectionsUtils:
 
 class GroundUtils:
 
-    def create_gradient(self, object: bpy.types.Object, name, otherName, material):
+    def create_gradient(_object: bpy.types.Object, _name, _otherName, _material):
         bpy.ops.object.editmode_toggle()  # Go in edit mode
         bpy.ops.mesh.select_all(action='DESELECT')  # Deselect all
 
         bpy.ops.object.material_slot_add()
-        object.material_slots[object.material_slots.__len__(
-        ) - 1].material = material
+        _object.material_slots[_object.material_slots.__len__(
+        ) - 1].material = _material
 
-        face_map = object.face_maps.find(name)
-        object.face_maps.active_index = face_map
+        face_map = _object.face_maps.find(_name)
+        _object.face_maps.active_index = face_map
         bpy.ops.object.face_map_select()
 
-        for map in object.face_maps:
-            if map.name != name and map.name != otherName:
-                object.face_maps.active_index = map.index
+        for map in _object.face_maps:
+            if map.name != _name and map.name != _otherName:
+                _object.face_maps.active_index = map.index
                 bpy.ops.object.face_map_deselect()
 
-        vertex_group = object.vertex_groups.find(name)
-        object.vertex_groups.active_index = vertex_group
+        vertex_group = _object.vertex_groups.find(_name)
+        _object.vertex_groups.active_index = vertex_group
         bpy.ops.object.vertex_group_deselect()
         # bpy.ops.mesh.select_more()
 
@@ -109,15 +109,15 @@ class GroundUtils:
         bpy.ops.mesh.select_all(action='DESELECT')  # Deselect all
         bpy.ops.object.editmode_toggle()  # Return in object mode
 
-    def create_facemask(self, object: bpy.types.Object, nameGroup, indexes, material):
-        faceMap: bpy.types.FaceMap = object.face_maps.new(name=nameGroup)
+    def create_facemask(_object: bpy.types.Object, _nameGroup, _indexes, _material):
+        face_map: bpy.types.FaceMap = _object.face_maps.new(name=_nameGroup)
 
-        faceMap.add(indexes)
+        face_map.add(_indexes)
 
-        object.face_maps.active_index = faceMap.index
+        _object.face_maps.active_index = face_map.index
         bpy.ops.object.material_slot_add()
-        object.material_slots[object.material_slots.__len__(
-        ) - 1].material = material
+        _object.material_slots[_object.material_slots.__len__(
+        ) - 1].material = _material
         bpy.ops.object.editmode_toggle()  # Go in edit mode
         bpy.ops.mesh.select_all(action='DESELECT')  # Deselect all
         bpy.ops.object.face_map_select()  # Select the faces of the faceMap
@@ -127,12 +127,12 @@ class GroundUtils:
 
         bpy.ops.mesh.select_less()
         bpy.ops.mesh.select_less()
-        Verts = [i.index for i in bmesh.from_edit_mesh(
+        verts = [i.index for i in bmesh.from_edit_mesh(
             bpy.context.active_object.data).verts if i.select]
 
         bpy.ops.object.face_map_deselect()
         bpy.ops.object.editmode_toggle()  # Return in object mode
 
-        vertexGroup: bpy.types.VertexGroup = object.vertex_groups.new(
-            name=nameGroup)
-        vertexGroup.add(Verts, 1.0, 'REPLACE')
+        vertex_group: bpy.types.VertexGroup = _object.vertex_groups.new(
+            name=_nameGroup)
+        vertex_group.add(verts, 1.0, 'REPLACE')
