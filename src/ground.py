@@ -104,29 +104,29 @@ class Ground():
 
         ground_mesh.to_mesh(ground.data)
         ground_mesh.free()
-        GroundUtils.create_facemask(object=ground, nameGroup="grass", indexes=list(self.grass_faces.keys()), material=MaterialUtils.create_material(
+        GroundUtils.create_facemask(self, object=ground, nameGroup="grass", indexes=list(self.grass_faces.keys()), material=MaterialUtils.create_material(
             "grass", self.colors[0]))
-        GroundUtils.create_facemask(object=ground, nameGroup="forest", indexes=list(self.forest_faces.keys()), material=MaterialUtils.create_material(
+        GroundUtils.create_facemask(self, object=ground, nameGroup="forest", indexes=list(self.forest_faces.keys()), material=MaterialUtils.create_material(
             "forest", self.colors[1]))
 
-        GroundUtils.create_facemask(object=ground, nameGroup="desert", indexes=list(self.desert_faces.keys()), material=MaterialUtils.create_material(
+        GroundUtils.create_facemask(self, object=ground, nameGroup="desert", indexes=list(self.desert_faces.keys()), material=MaterialUtils.create_material(
             "desert", self.colors[2]))
-        GroundUtils.create_facemask(object=ground, nameGroup="mountain", indexes=list(self.mountain_faces.keys()), material=MaterialUtils.create_material(
+        GroundUtils.create_facemask(self,object=ground, nameGroup="mountain", indexes=list(self.mountain_faces.keys()), material=MaterialUtils.create_material(
             "mountain", self.colors[3]))
-        GroundUtils.create_facemask(object=ground, nameGroup="snow", indexes=list(self.snow_faces.keys()), material=MaterialUtils.create_material(
+        GroundUtils.create_facemask(self, object=ground, nameGroup="snow", indexes=list(self.snow_faces.keys()), material=MaterialUtils.create_material(
             "snow", self.colors[4]))
 
-        GroundUtils.create_gradient(object=ground, name='desert', otherName='forest', material=MaterialUtils.create_material_between(
+        GroundUtils.create_gradient(self, object=ground, name='desert', otherName='forest', material=MaterialUtils.create_material_between(
             "desert-forest", self.colors[2], self.colors[1]))
-        GroundUtils.create_gradient(object=ground, name='desert', otherName='grass', material=MaterialUtils.create_material_between(
+        GroundUtils.create_gradient(self, object=ground, name='desert', otherName='grass', material=MaterialUtils.create_material_between(
             "desert-grass", self.colors[2], self.colors[1]))
-        GroundUtils.create_gradient(object=ground, name='forest', otherName='grass', material=MaterialUtils.create_material_between(
+        GroundUtils.create_gradient(self, object=ground, name='forest', otherName='grass', material=MaterialUtils.create_material_between(
             "forest-grass", self.colors[1], self.colors[0]))
-        GroundUtils.create_gradient(object=ground, name='mountain', otherName='grass', material=MaterialUtils.create_material_between(
+        GroundUtils.create_gradient(self, object=ground, name='mountain', otherName='grass', material=MaterialUtils.create_material_between(
             "mountain-grass", self.colors[3], self.colors[0]))
-        GroundUtils.create_gradient(object=ground, name='mountain', otherName='forest', material=MaterialUtils.create_material_between(
+        GroundUtils.create_gradient(self, object=ground, name='mountain', otherName='forest', material=MaterialUtils.create_material_between(
             "mountain-forest", self.colors[3], self.colors[1]))
-        GroundUtils.create_gradient(object=ground, name='mountain', otherName='desert', material=MaterialUtils.create_material_between(
+        GroundUtils.create_gradient(self, object=ground, name='mountain', otherName='desert', material=MaterialUtils.create_material_between(
             "mountain-desert", self.colors[3], self.colors[2]))
 
         # Add Decimate Modifier for Tris:

@@ -94,15 +94,15 @@ class GenerateBiomeContent():
             bpy.data.objects["Plane"], "bushParticles.002", "grass", "BushCollection2", int(_bush_count/3.0), 1.0, random.uniform(0.015, 0.025), random.randint(4, 6))
 
     def generate_forest_biome(_tree_count, _pine_count, _branch_count):
-        Tree.generateTree(0, 0, 0)
+        Tree.generate_tree(0, 0, 0)
         ParticleUtils.create_particle_system(
             bpy.data.objects["Plane"], "treeParticles", "forest", "TreeCollection", _tree_count, 0, random.uniform(0.025, 0.03), random.randint(0, 2))
 
-        Tree.generatePineTree(0, 0, 0.7)
+        Tree.generate_pine_tree(0, 0, 0.7)
         ParticleUtils.create_particle_system(
             bpy.data.objects["Plane"], "pineParticles", "forest", "PineCollection", _pine_count, 0, random.uniform(0.06, 0.07), random.randint(2, 4))
 
-        Tree.generateTreeWithBranches()
+        Tree.generate_tree_with_branches()
         ParticleUtils.create_particle_system(
             bpy.data.objects["Plane"], "branchParticles", "forest", "TreeWithBranchesCollection", _branch_count, 0, random.uniform(0.06, 0.07), random.randint(4, 6))
 

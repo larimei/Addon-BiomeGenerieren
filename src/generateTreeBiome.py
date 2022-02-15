@@ -22,7 +22,7 @@ MAX_SHIFT = 1.1
 AMOUNT = 5
 HEIGHT = AMOUNT / 4
 
-leavePositions = []
+leave_positions = []
 
 
 class Tree():
@@ -35,10 +35,10 @@ class Tree():
         return context.active_object is not None
 
     def execute(self, context):
-        Tree.generateTree()
+        Tree.generate_tree()
         return {'FINISHED'}
 
-    def generateTree(x, y, z):
+    def generate_tree(x, y, z):
 
         mesh = bpy.data.meshes.new("tree")  # add the new mesh
         obj = bpy.data.objects.new(mesh.name, mesh)
@@ -51,10 +51,10 @@ class Tree():
         edges = []
 
         for i in range(VERTICES):
-            posZ = i * 0.6 + x
-            posY = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT) + y
-            posX = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT) + z
-            vert = (posX, posY, posZ)
+            pos_z = i * 0.6 + x
+            pos_y = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT) + y
+            pos_x = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT) + z
+            vert = (pos_x, pos_y, pos_z)
             verts.append(vert)
             if i != 0:
                 edge = (i-1, i)
@@ -110,7 +110,7 @@ class Tree():
             utility.MaterialUtils.create_material("trunkMaterial", (0.3, 0.152, 0.02, 1.000000)))
 
         leaves = bpy.ops.mesh.primitive_ico_sphere_add(radius=random.uniform(1, 1.2), enter_editmode=False, align='WORLD', location=(
-            posX, posY, posZ + 4), scale=(random.uniform(2.5, 4), random.uniform(2.5, 4), random.uniform(4, 6)))
+            pos_x, pos_y, pos_z + 4), scale=(random.uniform(2.5, 4), random.uniform(2.5, 4), random.uniform(4, 6)))
         collection.objects.link(bpy.context.object)
         bpy.ops.collection.objects_remove(collection='Collection')
 
@@ -119,7 +119,7 @@ class Tree():
         bpy.context.object.data.materials.append(
             utility.MaterialUtils.create_material("leaveMaterial", (0.038, 0.7, 0.05, 1.000000)))
 
-    def generateCylinder(location, scale, width_scale_top, width_scale_bottom, trunk):
+    def generate_cylinder(location, scale, width_scale_top, width_scale_bottom, trunk):
         mesh = bpy.ops.mesh.primitive_cylinder_add(
             vertices=6, enter_editmode=False, align='WORLD', location=location, scale=scale)
         # rotate
@@ -166,7 +166,7 @@ class Tree():
 
         bpy.ops.object.editmode_toggle()
 
-    def generatePineTree(x, y, z):
+    def generate_pine_tree(x, y, z):
         collection = bpy.data.collections.new("PineCollection")
         bpy.context.scene.collection.children.link(collection)
         top = AMOUNT * 0.2
@@ -175,7 +175,7 @@ class Tree():
 
         for i in range(0, AMOUNT + 1):
             if i is 0:
-                Tree.generateCylinder(
+                Tree.generate_cylinder(
                     (x, y, z), (1, 1, 0.75), 0.6, 1, True)
 
                 active = bpy.context.object
@@ -186,10 +186,10 @@ class Tree():
 
             else:
                 if i is AMOUNT:
-                    Tree.generateCylinder(
+                    Tree.generate_cylinder(
                         (x, y, z + height), (1, 1, 0.8), 0.07, bottom, False)
                 else:
-                    Tree.generateCylinder(
+                    Tree.generate_cylinder(
                         (x, y, z + height), (1, 1, 0.8), top, bottom, False)
                     top = top - 0.2
                     bottom = bottom-0.4
@@ -202,7 +202,7 @@ class Tree():
                     "pineMaterial", (0.009, 0.141, 0.058, 1.000000)))
                 bpy.ops.collection.objects_remove(collection='Collection')
 
-    def generateBranches(edges, verts, vert, branch, lastIndex):
+    def generate_branches(edges, verts, vert, branch, lastIndex):
         bool = False
         for i in range(random.randrange(3, 5)):
             if branch:
@@ -229,9 +229,9 @@ class Tree():
                     edge = (len(verts) - 2, len(verts) - 1)
 
             edges.append(edge)
-        leavePositions.append(branchvert)
+        leave_positions.append(branchvert)
 
-    def generateLeaves(collection, radius, position, scale):
+    def generate_leaves(collection, radius, position, scale):
 
         mesh = bpy.data.meshes.new("LeaveBranches")  # add the new mesh
         obj = bpy.data.objects.new(mesh.name, mesh)
@@ -254,12 +254,12 @@ class Tree():
         bpy.context.object.data.materials.append(utility.MaterialUtils.create_material(
             "branchLeaveMaterial", (0.03, 0.6, 0.04, 1.000000)))
 
-    def generateMoreTrunk(edges, verts, vert):
+    def generate_more_trunk(edges, verts, vert):
         for i in range(0, 3):
-            posZ = vert[2] + 0.6
-            posY = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT)
-            posX = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT)
-            vert = (posX, posY, posZ)
+            pos_z = vert[2] + 0.6
+            pos_y = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT)
+            pos_x = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT)
+            vert = (pos_x, pos_y, pos_z)
             verts.append(vert)
             if i is not 0:
                 edge = (len(verts)-2, len(verts)-1)
@@ -267,9 +267,9 @@ class Tree():
             else:
                 edge = (VERTICES - 1, len(verts) - 1)
                 edges.append(edge)
-        leavePositions.append(vert)
+        leave_positions.append(vert)
 
-    def generateTreeWithBranches():
+    def generate_tree_with_branches():
 
         mesh = bpy.data.meshes.new("treeWithBranches")  # add the new mesh
         obj = bpy.data.objects.new(mesh.name, mesh)
@@ -283,19 +283,19 @@ class Tree():
         verts_trunk = []
 
         for i in range(VERTICES):
-            posZ = i * 0.6
-            posY = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT)
-            posX = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT)
-            vert = (posX, posY, posZ)
+            pos_z = i * 0.6
+            pos_y = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT)
+            pos_x = 1 * random.uniform(MIN_SHIFT, MAX_SHIFT)
+            vert = (pos_x, pos_y, pos_z)
             verts.append(vert)
             verts_trunk.append(vert)
             if i is not 0:
                 edge = (i-1, i)
                 edges.append(edge)
 
-        Tree.generateBranches(edges, verts, vert, True, VERTICES)
-        Tree.generateBranches(edges, verts, vert, False,  VERTICES)
-        Tree.generateMoreTrunk(edges, verts, vert)
+        Tree.generate_branches(edges, verts, vert, True, VERTICES)
+        Tree.generate_branches(edges, verts, vert, False,  VERTICES)
+        Tree.generate_more_trunk(edges, verts, vert)
 
         faces = []
 
@@ -353,11 +353,11 @@ class Tree():
         for modifier in obj.modifiers:
             bpy.ops.object.modifier_apply(modifier=modifier.name)
 
-        for pos in leavePositions:
-            if pos is leavePositions[len(leavePositions) - 1]:
-                Tree.generateLeaves(collection, random.uniform(
+        for pos in leave_positions:
+            if pos is leave_positions[len(leave_positions) - 1]:
+                Tree.generate_leaves(collection, random.uniform(
                     1, 1.7), (pos[0], pos[1], pos[2] + 1.6), (random.uniform(2, 2.3), random.uniform(2, 2.3), random.uniform(1.2, 2)))
 
             else:
-                Tree.generateLeaves(collection, random.uniform(1, 1.2), (pos[0], pos[1], pos[2]), (
+                Tree.generate_leaves(collection, random.uniform(1, 1.2), (pos[0], pos[1], pos[2]), (
                     random.uniform(1.3, 1.9), random.uniform(1.3, 1.9), random.uniform(1, 1.1)))
