@@ -22,10 +22,6 @@ bl_info = {
     "category": "Add Mesh",
 }
 
-# from .  import ui
-# This is the Main Panel in 3DView
-
-
 class GENERATEBIOMES_OT_reset_scene(bpy.types.Operator):
     bl_idname = "generatebiomes.reset_scene"
     bl_label = "Reset Scene"
