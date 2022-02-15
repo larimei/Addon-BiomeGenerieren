@@ -1,7 +1,7 @@
 import bpy
 import random
 
-from src import utility
+from src.utility import MaterialUtils
 
 
 class Stone:
@@ -28,7 +28,7 @@ class Stone:
             #bpy.ops.mesh.name = "stone"
             bpy.ops.object.shade_flat()
 
-            bpy.context.object.data.materials.append(utility.MaterialUtils.create_material(
+            bpy.context.object.data.materials.append(MaterialUtils.create_material(
                 "stone_material", (greytone, greytone, greytone, 1)))
 
             current_mesh = bpy.context.object.data

@@ -47,10 +47,10 @@ class Ground():
 
         v = VoronoiNoise(self.biome_scale, self.grass_weight,
                          self.forest_weight, self.desert_weight, self.mountain_weight)
-        hn = GlobalNoise(scale=6)
-        mn = MountainNoise(scale=0.4, distortion=0.3)
-        dn = DesertNoise(scale=4, turbulence=200)
-        pn = PlainNoise(scale=10, depth=0)
+        hn = GlobalNoise(_scale=6)
+        mn = MountainNoise(_scale=0.4, _distortion=0.3)
+        dn = DesertNoise(_scale=4, _turbulence=200)
+        pn = PlainNoise(_scale=10, _depth=0)
         for i in range(len(ground_mesh.verts)):
             vert = ground_mesh.verts[i].co
             biome, weight = v.get_biome_and_weight(

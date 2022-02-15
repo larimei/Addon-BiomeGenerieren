@@ -1,6 +1,6 @@
 import bpy
 import random
-from src import utility
+from src.utility import MaterialUtils
 
 VERTICES = 9
 MIN_SHIFT = 0.5
@@ -120,7 +120,7 @@ class Cactus:
             particle_system.child_seed = seed
             bpy.ops.object.select_all(action='SELECT')
             #spikes: bpy.types.ParticleSystem = bpy.ops.object.particle_system_add()
-            obj.data.materials.append(utility.MaterialUtils.create_material(
+            obj.data.materials.append(MaterialUtils.create_material(
                 "cactus_material", (red, green, 0.0, 1)))
             bpy.context.object.rotation_euler = (
                 0, 0, random.randrange(0, 360))
