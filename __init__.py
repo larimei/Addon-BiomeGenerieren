@@ -16,7 +16,7 @@ bl_info = {
     "version": (1, 0),
     "blender": (2, 90, 0),
     "location": "View3D > Toolbar > Generate Biomes",
-    "description": "Adds different biomes, where you can set different parameters",
+    "description": "Adds different biomes based different parameters",
     "warning": "",
     "wiki_url": "",
     "category": "Add Mesh",
@@ -26,9 +26,9 @@ bl_info = {
 # This is the Main Panel in 3DView
 
 
-class DeleteAll(bpy.types.Operator):
-    bl_idname = "delete.all"
-    bl_label = "Button text"
+class GENERATEBIOMES_OT_reset_scene(bpy.types.Operator):
+    bl_idname = "generatebiomes.reset_scene"
+    bl_label = "Reset Scene"
 
     def execute(self, context):
         for collection in bpy.data.collections:
@@ -41,12 +41,13 @@ class DeleteAll(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class GenerateGround(bpy.types.Operator):
-    bl_idname = "gen.landscape"
-    bl_label = "Button text"
+class GENERATEBIOMES_OT_generate_ground(bpy.types.Operator):
+    bl_idname = "generatebiomes.generate_ground"
+    bl_label = "Generate Ground"
 
     def execute(self, context):
-        DeleteAll.execute(DeleteAll, context)
+        GENERATEBIOMES_OT_reset_scene.execute(
+            GENERATEBIOMES_OT_reset_scene, context)
         # ground--------------------------
         weights = [float(context.scene.grassWeight), float(context.scene.forestWeight), float(
             context.scene.desertWeight), float(context.scene.mountainWeight)]
@@ -125,8 +126,8 @@ class GenerateBiomeContent():
             bpy.data.objects["Plane"], "stoneParticles.002", "desert", "StoneCollection2", int(_stone_count/3), 1.0, random.uniform(0.02, 0.03), random.randint(12, 14))
 
 
-classes = [MainPanel, DistributionPanel, DesertPanel, ForestPanel, GrassPanel, MountainPanel,
-           GenerateGround, DeleteAll]
+classes = [GENERATEBIOMES_PT_MainPanel, GENERATEBIOMES_PT_DistributionPanel, GENERATEBIOMES_PT_DesertPanel, GENERATEBIOMES_PT_ForestPanel, GENERATEBIOMES_PT_GrassPanel, GENERATEBIOMES_PT_MountainPanel,
+           GENERATEBIOMES_OT_generate_ground, GENERATEBIOMES_OT_reset_scene]
 
 
 def register():

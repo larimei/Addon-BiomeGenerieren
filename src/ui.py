@@ -1,7 +1,7 @@
 import bpy
 
 
-class MainPanel(bpy.types.Panel):
+class GENERATEBIOMES_PT_MainPanel(bpy.types.Panel):
     bl_label = "Generate Biomes"
     bl_idname = "GENERATEBIOMES_PT_MainPanel"
     bl_space_type = 'VIEW_3D'
@@ -32,12 +32,12 @@ class MainPanel(bpy.types.Panel):
         # insert operator
         row2.scale_x = 7
         row2.scale_y = 2
-        row2.operator("gen.landscape", text="Generate Scene")
+        row2.operator("generatebiomes.generate_ground", text="Generate Scene")
         # insert operator
-        row2.operator("delete.all", text="Reset Scene")
+        row2.operator("generatebiomes.reset_scene", text="Reset Scene")
 
 
-class DistributionPanel(bpy.types.Panel):
+class GENERATEBIOMES_PT_DistributionPanel(bpy.types.Panel):
     bl_label = "Biome Distribution Settings"
     bl_idname = "GENERATEBIOMES_PT_DistributionPanel"
     bl_space_type = 'VIEW_3D'
@@ -54,7 +54,7 @@ class DistributionPanel(bpy.types.Panel):
         col.prop(context.scene, "mountainWeight", text="Mountain Weight")
 
 
-class DesertPanel(bpy.types.Panel):
+class GENERATEBIOMES_PT_DesertPanel(bpy.types.Panel):
     bl_label = "Desert Settings"
     bl_idname = "GENERATEBIOMES_PT_DesertPanel"
     bl_space_type = 'VIEW_3D'
@@ -70,7 +70,7 @@ class DesertPanel(bpy.types.Panel):
         col.prop(context.scene, "desertColor", text="Desert Color")
 
 
-class GrassPanel(bpy.types.Panel):
+class GENERATEBIOMES_PT_GrassPanel(bpy.types.Panel):
     bl_label = "Grass Settings"
     bl_idname = "GENERATEBIOMES_PT_GrassPanel"
     bl_space_type = 'VIEW_3D'
@@ -87,7 +87,7 @@ class GrassPanel(bpy.types.Panel):
         col.prop(context.scene, "grassColor", text="Grass Surface Color")
 
 
-class ForestPanel(bpy.types.Panel):
+class GENERATEBIOMES_PT_ForestPanel(bpy.types.Panel):
     bl_label = "Forest Settings"
     bl_idname = "GENERATEBIOMES_PT_ForestPanel"
     bl_space_type = 'VIEW_3D'
@@ -104,7 +104,7 @@ class ForestPanel(bpy.types.Panel):
         col.prop(context.scene, "forestColor", text="Forest Color")
 
 
-class MountainPanel(bpy.types.Panel):
+class GENERATEBIOMES_PT_MountainPanel(bpy.types.Panel):
     bl_label = "Mountain Settings"
     bl_idname = "GENERATEBIOMES_PT_MountainPanel"
     bl_space_type = 'VIEW_3D'
